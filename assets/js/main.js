@@ -80,30 +80,66 @@
       img.src = srcOf(name);
       img.alt = "웨딩 사진 " + (idx + 1);
       img.loading = "lazy";
-      img.addEventListener("click", function () { openLightbox(idx); });
+      img.addEventListener("click", function () {
+        LB.openList(list.map(srcOf), idx);
+      });
       grid.appendChild(img);
     });
+  }
 
-    var lb = document.getElementById("lightbox");
-    var lbImg = document.getElementById("lbImg");
-    var cur = 0;
-
+  /* ---------- Lightbox (갤러리 · 약도 공용) ---------- */
+  var LB = (function () {
+    var lb, lbImg, prev, next, list = [], cur = 0, single = false, ready = false;
     function show(i) {
+      if (single || !list.length) return;
       cur = (i + list.length) % list.length;
-      lbImg.src = srcOf(list[cur]);
+      lbImg.src = list[cur];
     }
-    function openLightbox(i) { show(i); lb.hidden = false; document.body.style.overflow = "hidden"; }
-    function close() { lb.hidden = true; document.body.style.overflow = ""; }
+    function open() { lb.hidden = false; document.body.style.overflow = "hidden"; }
+    function close() { lb.hidden = true; document.body.style.overflow = ""; lbImg.src = ""; }
+    function setup() {
+      if (ready) return;
+      lb = document.getElementById("lightbox");
+      if (!lb) return;
+      lbImg = document.getElementById("lbImg");
+      prev = document.getElementById("lbPrev");
+      next = document.getElementById("lbNext");
+      document.getElementById("lbClose").addEventListener("click", close);
+      prev.addEventListener("click", function () { show(cur - 1); });
+      next.addEventListener("click", function () { show(cur + 1); });
+      lb.addEventListener("click", function (e) { if (e.target === lb) close(); });
+      document.addEventListener("keydown", function (e) {
+        if (lb.hidden) return;
+        if (e.key === "Escape") close();
+        if (!single && e.key === "ArrowLeft") show(cur - 1);
+        if (!single && e.key === "ArrowRight") show(cur + 1);
+      });
+      ready = true;
+    }
+    return {
+      openList: function (srcs, i) {
+        setup(); if (!ready) return;
+        single = false; list = srcs;
+        prev.style.display = ""; next.style.display = "";
+        show(i); open();
+      },
+      openSingle: function (src) {
+        setup(); if (!ready) return;
+        single = true; list = [];
+        prev.style.display = "none"; next.style.display = "none";
+        lbImg.src = src; open();
+      }
+    };
+  })();
 
-    document.getElementById("lbClose").addEventListener("click", close);
-    document.getElementById("lbPrev").addEventListener("click", function () { show(cur - 1); });
-    document.getElementById("lbNext").addEventListener("click", function () { show(cur + 1); });
-    lb.addEventListener("click", function (e) { if (e.target === lb) close(); });
-    document.addEventListener("keydown", function (e) {
-      if (lb.hidden) return;
-      if (e.key === "Escape") close();
-      if (e.key === "ArrowLeft") show(cur - 1);
-      if (e.key === "ArrowRight") show(cur + 1);
+  /* ---------- 도보 약도 확대 ---------- */
+  function initWalkMap() {
+    var a = document.querySelector(".walk-map");
+    if (!a) return;
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      var img = a.querySelector("img");
+      LB.openSingle((img && (img.currentSrc || img.src)) || a.getAttribute("href"));
     });
   }
 
@@ -191,6 +227,7 @@
     initTogether();
     initCalendar();
     initGallery();
+    initWalkMap();
     initMaps();
     initCopy();
   });
