@@ -61,13 +61,6 @@
       <p class="calendar__dday" id="dday"></p>
     </section>
 
-    <!-- ===== 갤러리 ===== -->
-    <section class="gallery reveal">
-      <h2 class="section-title">갤러리</h2>
-      <div class="gallery__grid" id="galleryGrid"></div>
-      <p class="gallery__empty" id="galleryEmpty">사진을 준비 중입니다.</p>
-    </section>
-
     <!-- ===== 오시는 길 ===== -->
     <section class="location reveal">
       <h2 class="section-title">오시는 길</h2>
@@ -92,6 +85,15 @@
       <div class="info-block">
         <h3>자가용</h3>
         <p>용산 전쟁기념관 주차 후 대절버스로 이동<br />또는 국립중앙박물관 주차 후 도보로 이동</p>
+      </div>
+      <div class="info-block" id="walkMapBlock">
+        <h3>도보 약도</h3>
+        <p>국립중앙박물관 주차 후 도보 이동 시 참고하세요.</p>
+        <a class="walk-map" href="assets/images/walk-map.jpg" target="_blank" rel="noopener">
+          <img src="assets/images/walk-map.jpg" alt="국립중앙박물관에서 용산가족공원까지 도보 약도" loading="lazy"
+               onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='assets/images/walk-map.png';this.closest('a').href='assets/images/walk-map.png';}else{document.getElementById('walkMapBlock').style.display='none';}" />
+        </a>
+        <p class="walk-map__hint">이미지를 누르면 크게 볼 수 있어요.</p>
       </div>
       <div class="info-block">
         <h3>대절버스</h3>
@@ -135,12 +137,20 @@
       <p class="notice__text">화환은 공간 특성상 정중히 사양합니다.<br />마음만 감사히 받겠습니다.</p>
     </section>
 
+    <!-- ===== 갤러리 ===== -->
+    <section class="gallery reveal">
+      <h2 class="section-title">갤러리</h2>
+      <div class="gallery__grid" id="galleryGrid"></div>
+      <p class="gallery__empty" id="galleryEmpty">사진을 준비 중입니다.</p>
+    </section>
 
     <footer class="footer">
       <p>박종현 &amp; 최유진</p>
       <p class="footer__date">2026. 10. 25.</p>
     </footer>
   </main>
+
+
 
   <!-- 라이트박스 -->
   <div class="lightbox" id="lightbox" hidden>

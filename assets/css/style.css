@@ -171,6 +171,14 @@ section + section { border-top: 1px solid var(--line); }
 .info-block p + p { margin-top: 4px; }
 .info-block strong { color: var(--accent); font-weight: 700; }
 
+.walk-map { display: block; margin-top: 14px; }
+.walk-map img {
+  width: 100%; height: auto; display: block;
+  border-radius: 8px; border: 1px solid var(--line);
+  background: #fff;
+}
+.walk-map__hint { margin-top: 8px; font-size: 0.78rem; color: var(--ink-soft); }
+
 /* ===== Accounts ===== */
 .accounts__desc { color: var(--ink-soft); font-size: 0.92rem; margin-bottom: 24px; }
 .acc-group { border: 1px solid var(--line); border-radius: 10px; margin-bottom: 12px; background: var(--paper); overflow: hidden; text-align: left; }
