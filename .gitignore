@@ -4,5 +4,13 @@
 # 개인 설정 (권한 자동 허용 등) — 공개 레포에 올리지 않음
 .claude/settings.local.json
 
+# 갤러리 원본 사진 — 배포에는 WebP만 사용하므로 원본은 올리지 않음 (로컬 백업용)
+/assets/gallery/*
+!/assets/gallery/.gitkeep
+!/assets/gallery/*.webp
+
+# QR 코드 — 올리지 않음 (로컬에서 인쇄/공유용)
+/assets/images/qr.png
+
 # 임시
 *.log
