@@ -2,7 +2,18 @@
   "use strict";
 
   var WEDDING = new Date(2026, 9, 25, 15, 0, 0); // 2026-10-25 15:00
+  var MEET_DATE = new Date(2022, 3, 23); // 처음 만난 날 2022-04-23 (만난 날을 1일째로 카운트)
   var PLACE_QUERY = "용산가족공원";
+
+  /* ---------- 함께한 날수 ---------- */
+  function initTogether() {
+    var el = document.getElementById("togetherDays");
+    if (!el) return;
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var start = new Date(MEET_DATE.getFullYear(), MEET_DATE.getMonth(), MEET_DATE.getDate());
+    var days = Math.floor((today - start) / 86400000) + 1; // 만난 날 포함
+    if (days > 0) el.textContent = String(days);
+  }
 
   /* ---------- Reveal on scroll ---------- */
   function initReveal() {
@@ -177,6 +188,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     initReveal();
+    initTogether();
     initCalendar();
     initGallery();
     initMaps();
