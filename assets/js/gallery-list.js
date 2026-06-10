@@ -13,6 +13,7 @@ window.GALLERY = [
   "IMG_7504.webp",
   "IMG_7594.webp",
   "IMG_7884.webp",
+  "IMG_8007.jpg",
   "IMG_8145.webp",
   "IMG_8150.JPG",
   "IMG_8274.webp",
@@ -24,5 +25,6 @@ window.GALLERY = [
   "IMG_8791.webp",
   "IMG_8908.webp",
   "IMG_8923.webp",
+  "main.jpg",
   "P1100560.webp",
 ];
