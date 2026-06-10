@@ -1,5 +1,12 @@
 // 자동 생성 파일 — scripts/build-gallery.sh 가 갱신합니다.
 window.GALLERY = [
+  "IMG_3360.JPG",
+  "IMG_4201.JPG",
+  "IMG_4670.jpg",
+  "IMG_6705.jpg",
+  "IMG_6717.PNG",
+  "IMG_6734.jpg",
+  "IMG_6740.jpg",
   "IMG_7198.webp",
   "IMG_7211.webp",
   "IMG_7430.webp",
@@ -7,7 +14,10 @@ window.GALLERY = [
   "IMG_7594.webp",
   "IMG_7884.webp",
   "IMG_8145.webp",
+  "IMG_8150.JPG",
   "IMG_8274.webp",
+  "IMG_8479.JPG",
+  "IMG_8615.JPG",
   "IMG_8680 2.webp",
   "IMG_8726.webp",
   "IMG_8743.webp",
