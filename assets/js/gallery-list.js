@@ -28,5 +28,12 @@ window.GALLERY = [
   "IMG_8791.webp",
   "IMG_8908.webp",
   "IMG_8923.webp",
+  "IMG_9945.JPG",
+  "IMG_9946.JPG",
+  "IMG_9947.JPG",
+  "IMG_9948.JPG",
+  "IMG_9951.JPG",
+  "IMG_9952.JPG",
+  "IMG_9953.JPG",
   "P1100560.webp",
 ];
