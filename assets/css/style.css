@@ -1,13 +1,13 @@
 :root {
   --bg: #f5f8f1;
   --paper: #ffffff;
-  --ink: #313a2e;
-  --ink-soft: #63705a;
+  --ink: #2b332a;
+  --ink-soft: #515c49;
   --line: #e0e7d8;
   --accent: #7c9266;
   --accent-soft: #cdd9bd;
   --maxw: 460px;
-  --serif: "Nanum Myeongjo", "Gowun Batang", serif;
+  --serif: "Song Myung", "Gowun Batang", serif;
   --sans: "Noto Sans KR", sans-serif;
 }
 
