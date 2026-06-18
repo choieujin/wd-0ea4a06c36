@@ -6,9 +6,8 @@
     var text = (box.getAttribute("data-text") || "").toUpperCase();
     if (!text) return;
     var anchor = box.getAttribute("data-anchor") || "left"; // 글자가 흘러내리는 방향
-    var chars = text.split("");
-    // 이름 앞에 "TO ." 접두 구슬을 붙여 레퍼런스 감성 재현
-    var seq = ["T", "O", "·"].concat(chars);
+    // 이름 글자만 구슬로 (접두 "TO ·" 제거)
+    var seq = text.split("");
 
     var frag = document.createDocumentFragment();
 

@@ -296,6 +296,10 @@ section.paper + section.paper::after {
 }
 
 /* ===== Childhood (가족사진 + 아기 컷아웃 콜라주) ===== */
+.child-intro {
+  font-family: var(--hand); font-size: 1.3rem; color: var(--ink-soft);
+  line-height: 1.6; margin: -8px 0 38px;
+}
 .child-group + .child-group { margin-top: 60px; }
 .child-group__who {
   font-family: var(--hand); font-size: 1.3rem; color: var(--ink); margin-bottom: 16px;
