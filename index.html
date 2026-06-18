@@ -14,33 +14,48 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri.css" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/style.css?v=7" />
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@300;400;500;700&family=Pinyon+Script&family=Parisienne&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css?v=8" />
 </head>
 <body>
 
   <main class="invitation">
 
-    <!-- ===== 표지 ===== -->
+    <!-- ===== 표지 (검정 구겨진 종이) ===== -->
     <section class="cover reveal">
-      <p class="cover__label">WEDDING INVITATION</p>
-      <div class="cover__photo">
-        <img src="assets/images/main.jpg" alt="박종현 최유진" onerror="this.classList.add('is-missing')" />
+      <p class="cover__script">You're invited<br /><span>to our wedding</span></p>
+
+      <div class="cover__stage">
+        <div class="duo duo--gray cover__photo">
+          <img src="assets/gallery/IMG_8274.webp" alt="박종현 최유진" onerror="this.classList.add('is-missing')" />
+        </div>
+        <div class="beads" data-text="JONGHYUN" data-color="pink" data-anchor="left"></div>
+        <div class="beads" data-text="YUJIN" data-color="blue" data-anchor="right"></div>
       </div>
-      <h1 class="cover__names">
-        <span>박종현</span>
-        <span class="cover__amp">&amp;</span>
-        <span>최유진</span>
-      </h1>
-      <p class="cover__date">2026. 10. 25. SUN 3:00 PM</p>
-      <p class="cover__place">용산가족공원</p>
+
+      <div class="heart-card cover__heart">
+        <div class="heart-card__inner">
+          <p class="cover__names">Park Jong Hyun<br /><span class="cover__star">✶</span><br />Choi Yu Jin</p>
+          <p class="cover__date">2026. 10. 25. SUN 3:00 PM</p>
+          <p class="cover__place">용산가족공원</p>
+        </div>
+      </div>
+      <span class="float-heart float-heart--a"></span>
+      <span class="float-heart float-heart--b"></span>
     </section>
 
-    <!-- ===== 인사말 ===== -->
-    <section class="greeting reveal">
+    <!-- ===== 인사말 (편지) ===== -->
+    <section class="greeting reveal paper">
+      <p class="script-label">Invitation</p>
       <h2 class="section-title">초대합니다</h2>
+
+      <div class="letter-stage">
+        <div class="duo duo--pink letter-photo">
+          <img src="assets/gallery/IMG_8923.webp" alt="박종현 최유진" loading="lazy" />
+        </div>
+        <div class="beads beads--sm" data-text="LOVE" data-color="pink" data-anchor="right"></div>
+      </div>
+
       <p class="greeting__text">
         함께 보낸 <span id="togetherDays">1506</span>일,<br />하루하루가 빠짐없이 즐거웠기에<br />
         앞으로의 날들도 함께 채워가려 합니다.<br /><br />
@@ -49,14 +64,26 @@
         귀한 걸음 하시어 축복해 주시면<br />
         감사하겠습니다.
       </p>
+
       <div class="greeting__family">
         <p><span>박학진 · 최옥희</span>의 아들 <strong>종현</strong></p>
         <p><span>최선학 · 이혜영</span>의 딸 <strong>유진</strong></p>
       </div>
     </section>
 
+    <!-- ===== 두 사람 (폴라로이드) ===== -->
+    <section class="story reveal">
+      <p class="story__quote">서로의 시간이 만나<br />하나의 이야기가 되었어요.</p>
+      <div class="polaroid">
+        <img src="assets/images/main.jpg" alt="박종현 최유진" loading="lazy" onerror="this.closest('.polaroid').style.display='none'" />
+        <p class="polaroid__cap">Jonghyun &amp; Yujin · 26.10.25</p>
+      </div>
+      <span class="float-heart float-heart--c"></span>
+    </section>
+
     <!-- ===== 캘린더 / D-day ===== -->
-    <section class="calendar reveal">
+    <section class="calendar reveal paper">
+      <p class="script-label">The Day</p>
       <h2 class="section-title">예식 일시</h2>
       <p class="calendar__headline">2026년 10월 25일 일요일<br />오후 3시</p>
       <div class="calendar__grid" id="calendar"></div>
@@ -64,7 +91,8 @@
     </section>
 
     <!-- ===== 오시는 길 ===== -->
-    <section class="location reveal">
+    <section class="location reveal paper">
+      <p class="script-label">Location</p>
       <h2 class="section-title">오시는 길</h2>
       <p class="location__name">용산가족공원</p>
       <p class="location__addr">서울특별시 용산구 서빙고로 137</p>
@@ -104,7 +132,8 @@
     </section>
 
     <!-- ===== 마음 전하기 (계좌) ===== -->
-    <section class="accounts reveal">
+    <section class="accounts reveal paper">
+      <p class="script-label">With Love</p>
       <h2 class="section-title">마음 전하기</h2>
       <p class="accounts__desc">참석이 어려우신 분들을 위해<br />계좌번호를 안내드립니다.</p>
 
@@ -138,21 +167,26 @@
     </section>
 
     <!-- ===== 기타 안내 ===== -->
-    <section class="notice reveal">
+    <section class="notice reveal paper">
+      <p class="script-label">Notice</p>
       <h2 class="section-title">안내</h2>
       <p class="notice__text">용산가족공원 야외에서 진행되는 예식입니다.<br />복장은 자유예요! 격식 차리지 않으셔도 괜찮아요.<br />흰옷이든 후드티에 청바지든, 편한 대로<br />소풍 오듯 와 주셔도 좋습니다 :)</p>
       <p class="notice__text">화환은 공간 특성상 정중히 사양합니다.<br />마음만 감사히 받겠습니다.</p>
     </section>
 
     <!-- ===== 갤러리 ===== -->
-    <section class="gallery reveal">
+    <section class="gallery reveal paper">
+      <p class="script-label">Gallery</p>
       <h2 class="section-title">갤러리</h2>
       <div class="gallery__grid" id="galleryGrid"></div>
       <p class="gallery__empty" id="galleryEmpty">사진을 준비 중입니다.</p>
     </section>
 
+    <!-- ===== 푸터 (검정 구겨진 종이) ===== -->
     <footer class="footer">
-      <p>박종현 &amp; 최유진</p>
+      <p class="footer__script">Thank you</p>
+      <span class="footer__heart"></span>
+      <p class="footer__names">박종현 &amp; 최유진</p>
       <p class="footer__date">2026. 10. 25.</p>
     </footer>
   </main>
@@ -170,7 +204,8 @@
   <!-- 토스트 -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="assets/js/gallery-list.js?v=7"></script>
-  <script src="assets/js/main.js?v=7"></script>
+  <script src="assets/js/gallery-list.js?v=8"></script>
+  <script src="assets/js/decor.js?v=8"></script>
+  <script src="assets/js/main.js?v=8"></script>
 </body>
 </html>
