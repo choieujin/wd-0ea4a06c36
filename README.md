@@ -1,8 +1,4 @@
-# 모바일 청첩장 — 박종현 ♥ 최유진
-
-2026년 10월 25일(일) 오후 3시 · 용산가족공원
-
-**공개 주소:** https://choieujin.github.io/wd-0ea4a06c36/
+# 모바일 청첩장
 
 순수 HTML/CSS/JS로 만든 정적 사이트이며 GitHub Pages로 배포됩니다.
 
