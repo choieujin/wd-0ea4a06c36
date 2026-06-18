@@ -42,7 +42,48 @@
     });
   }
 
+  // 페이지 곳곳에 각진 분홍 하트를 다양한 형태·크기로 흩뿌리기
+  function sprinkleHearts() {
+    var variants = ["v1", "v2", "v3", "v4"];
+    // 표지는 이미 하트가 있으니 제외, 나머지 섹션 + 푸터에 배치
+    var targets = [].slice.call(document.querySelectorAll("section:not(.cover), .footer"));
+    var made = [];
+
+    targets.forEach(function (sec) {
+      var n = 2 + Math.floor(Math.random() * 2); // 섹션당 2~3개
+      for (var i = 0; i < n; i++) {
+        var h = document.createElement("span");
+        var v = variants[Math.floor(Math.random() * variants.length)];
+        h.className = "deco-heart xheart xheart--" + v;
+        if (Math.random() < 0.22) h.classList.add("xheart--sky");
+
+        var size = 9 + Math.round(Math.random() * 21); // 9~30px
+        h.style.width = size + "px";
+        h.style.height = size + "px";
+        h.style.left = (3 + Math.random() * 90).toFixed(1) + "%";
+
+        // 텍스트를 피해 위/아래 여백 띠 안에만 배치
+        var off = 6 + Math.random() * 36;
+        if (Math.random() < 0.5) h.style.top = off + "px";
+        else h.style.bottom = off + "px";
+
+        h.style.transform = "rotate(" + Math.round(Math.random() * 50 - 25) + "deg)";
+        h.style.setProperty("--o", (0.5 + Math.random() * 0.4).toFixed(2));
+
+        sec.appendChild(h);
+        made.push(h);
+      }
+    });
+
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        made.forEach(function (h) { h.classList.add("is-on"); });
+      });
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".beads").forEach(renderBeads);
+    sprinkleHearts();
   });
 })();
