@@ -7,6 +7,8 @@
   --ink-soft: #6b6457;
   --line: #d8cdb4;
   --pink: #ff3d83;
+  --orage:#ffaa33;
+  --navy: #403F6F;
   --pink-soft: #ff7eae;
   --sky: #bcdcff;
   --sky-ink: #2f5f9c;
@@ -332,6 +334,24 @@ section.paper + section.paper::after {
     drop-shadow(1.6px -1.6px 0 var(--pink)) drop-shadow(-1.6px 1.6px 0 var(--pink))
     drop-shadow(0 4px 6px rgba(0,0,0,0.22));
 }
+
+.cutout--navy img {
+  filter:
+    drop-shadow(2px 0 0 var(--navy)) drop-shadow(-2px 0 0 var(--navy))
+    drop-shadow(0 2px 0 var(--navy)) drop-shadow(0 -2px 0 var(--navy))
+    drop-shadow(1.6px 1.6px 0 var(--navy)) drop-shadow(-1.6px -1.6px 0 var(--navy))
+    drop-shadow(1.6px -1.6px 0 var(--navy)) drop-shadow(-1.6px 1.6px 0 var(--navy))
+    drop-shadow(0 4px 6px rgba(0,0,0,0.22));
+}
+
+.cutout--orange img {
+  filter:
+    drop-shadow(2px 0 0 var(--orage)) drop-shadow(-2px 0 0 var(--orage))
+    drop-shadow(0 2px 0 var(--orage)) drop-shadow(0 -2px 0 var(--orage))
+    drop-shadow(1.6px 1.6px 0 var(--orage)) drop-shadow(-1.6px -1.6px 0 var(--orage))
+    drop-shadow(1.6px -1.6px 0 var(--orage)) drop-shadow(-1.6px 1.6px 0 var(--orage))
+    drop-shadow(0 4px 6px rgba(0,0,0,0.22));
+}
 .cutout--sky img {
   filter:
     drop-shadow(2px 0 0 var(--sky)) drop-shadow(-2px 0 0 var(--sky))
@@ -485,6 +505,78 @@ section.paper + section.paper::after {
 }
 .footer__names { font-family: var(--hand); font-size: 1.4rem; letter-spacing: 0.06em; }
 .footer__date { margin-top: 6px; font-size: 0.85rem; opacity: 0.85; }
+
+/* ===== Heart Locket (은색 하트 로켓) ===== */
+.locket-section {
+  --heart: polygon(50% 96%, 35% 84%, 18% 70%, 6% 54%, 1% 38%, 5% 23%, 17% 15%, 30% 16%, 41% 24%, 50% 36%, 59% 24%, 70% 16%, 83% 15%, 95% 23%, 99% 38%, 94% 54%, 82% 70%, 65% 84%);
+  background: var(--black);
+  background-image: var(--grain);
+  background-blend-mode: soft-light;
+  color: #fff;
+  padding: 80px 24px 92px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.locket-section .script-label { color: var(--sky); position: relative; z-index: 2; }
+
+.locket {
+  position: relative;
+  width: 100%;
+  max-width: 330px;
+  margin: 34px auto 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+.locket__chain {
+  position: absolute;
+  top: -36px; left: 0; right: 0;
+  width: 100%; height: 120px;
+  z-index: 1; pointer-events: none;
+}
+.locket__half { width: 48%; position: relative; z-index: 2; }
+.locket__half--left { transform: rotate(-7deg); transform-origin: bottom right; }
+.locket__half--right { transform: rotate(7deg); transform-origin: bottom left; }
+
+.lk-heart { position: relative; aspect-ratio: 1 / 0.9; }
+.lk-rim {
+  position: absolute; inset: 0; clip-path: var(--heart);
+  background: linear-gradient(135deg, #f4f4f4 0%, #989898 26%, #fbfbfb 50%, #787878 74%, #dadada 100%);
+  filter: drop-shadow(0 6px 13px rgba(0,0,0,0.55));
+}
+.lk-rim::after {
+  content: ""; position: absolute; inset: 0; clip-path: var(--heart);
+  background-image: radial-gradient(circle, rgba(255,255,255,0.55) 0.5px, transparent 1px);
+  background-size: 4px 4px; mix-blend-mode: overlay; opacity: 0.8;
+}
+.lk-groove {
+  position: absolute; inset: 7%; clip-path: var(--heart);
+  background: linear-gradient(315deg, #ffffff 0%, #8a8a8a 42%, #d2d2d2 60%, #6e6e6e 100%);
+}
+.lk-photo {
+  position: absolute; inset: 14%; clip-path: var(--heart); overflow: hidden;
+  background: #1d1d1d;
+}
+.lk-photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.08); display: block; }
+.lk-ph {
+  position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+  color: #b9b9b9; font-family: var(--hand); font-size: 0.95rem;
+}
+.lk-photo.is-empty img { display: none; }
+.lk-photo.is-empty .lk-ph { display: flex; }
+.lk-photo.is-empty { background: repeating-linear-gradient(45deg, #2b2b2b 0 8px, #1f1f1f 8px 16px); }
+
+.locket__hinge {
+  position: absolute; left: 50%; top: 30%; transform: translateX(-50%);
+  width: 13px; height: 26%; z-index: 4;
+  background: linear-gradient(90deg, #6f6f6f, #f2f2f2, #6f6f6f);
+  border-radius: 3px; box-shadow: 0 2px 5px rgba(0,0,0,0.55);
+}
+.locket__heart {
+  bottom: -18px; right: 16%; width: 22px; height: 22px; z-index: 5;
+  transform: rotate(-10deg);
+}
 
 /* ===== Lightbox ===== */
 .lightbox {
