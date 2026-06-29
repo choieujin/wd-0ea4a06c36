@@ -267,6 +267,49 @@ section.paper + section.paper::after {
 .greeting__family p { margin: 4px 0; }
 .greeting__family strong { color: var(--pink); font-weight: 700; }
 
+/* ===== Sketchbook (블루그레이 크라프트 + 스프링 제본 + 흰 손글씨) ===== */
+.sketchbook {
+  position: relative;
+  max-width: 388px;
+  margin: 0 auto 30px;
+  padding: 40px 20px 42px 46px;       /* 왼쪽은 제본 공간 확보 */
+  border-radius: 6px;
+  color: #f7f4ec;
+  background-color: #67738c;
+  background-image:
+    radial-gradient(60% 42% at 78% 18%, rgba(0,0,0,0.10), transparent 70%),
+    radial-gradient(55% 40% at 18% 82%, rgba(0,0,0,0.10), transparent 70%),
+    var(--grain);
+  background-blend-mode: soft-light, soft-light, soft-light;
+  box-shadow:
+    inset 26px 0 22px -22px rgba(0,0,0,0.4),   /* 제본 쪽 그늘 */
+    0 12px 26px rgba(0,0,0,0.22);
+  overflow: hidden;
+  transform: rotate(-0.6deg);
+}
+.sketchbook::before {                  /* 종이 그레인 한 겹 더 */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: var(--grain);
+  opacity: 0.07; mix-blend-mode: overlay;
+}
+/* 왼쪽 스프링 제본 구멍 */
+.sketchbook__rings {
+  position: absolute; top: 10px; bottom: 10px; left: 10px; width: 16px;
+  z-index: 3; pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.30) 0 5px, transparent 6px),
+    radial-gradient(circle, rgba(18,16,14,0.55) 0 3px, transparent 3.6px);
+  background-size: 16px 26px, 16px 26px;
+  background-position: center 4px, center 4px;
+}
+/* 스케치북 안에서는 글씨를 흰색 손글씨로 (좁은 폭에 맞춰 살짝 작게) */
+.sketchbook .story__quote,
+.sketchbook .greeting__text { color: #f7f4ec; position: relative; z-index: 2; }
+.sketchbook .story__quote { font-size: 1.35rem; margin-bottom: 0; }
+.sketchbook .greeting__text { font-size: 1.24rem; line-height: 1.7; }
+.sketchbook .greeting__text span { color: #ffd0e0; }
+.sketchbook + .sketchbook { margin-top: -6px; }
+
 /* ===== Story (폴라로이드) ===== */
 .story { background: var(--cream-2); padding: 60px 26px; }
 .story::before {
