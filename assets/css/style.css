@@ -267,48 +267,65 @@ section.paper + section.paper::after {
 .greeting__family p { margin: 4px 0; }
 .greeting__family strong { color: var(--pink); font-weight: 700; }
 
-/* ===== Sketchbook (블루그레이 크라프트 + 스프링 제본 + 흰 손글씨) ===== */
-.sketchbook {
-  position: relative;
-  max-width: 388px;
-  margin: 0 auto 30px;
-  padding: 40px 20px 42px 46px;       /* 왼쪽은 제본 공간 확보 */
-  border-radius: 6px;
-  color: #f7f4ec;
+/* ===== Sketchbook Page (블루그레이 크라프트 종이 + 스프링 제본 + 흰 손글씨) =====
+   섹션 전체를 한 장의 스케치북 페이지로 만들어 글·사진이 같은 종이 위에 얹힌다. */
+.sketchbook-page {
   background-color: #67738c;
   background-image:
-    radial-gradient(60% 42% at 78% 18%, rgba(0,0,0,0.10), transparent 70%),
-    radial-gradient(55% 40% at 18% 82%, rgba(0,0,0,0.10), transparent 70%),
+    radial-gradient(60% 38% at 80% 14%, rgba(0,0,0,0.12), transparent 70%),
+    radial-gradient(52% 36% at 16% 86%, rgba(0,0,0,0.12), transparent 70%),
     var(--grain);
   background-blend-mode: soft-light, soft-light, soft-light;
-  box-shadow:
-    inset 26px 0 22px -22px rgba(0,0,0,0.4),   /* 제본 쪽 그늘 */
-    0 12px 26px rgba(0,0,0,0.22);
+  color: #f7f4ec;
+  padding-left: 46px;                  /* 왼쪽 제본 공간 확보 */
+  box-shadow: inset 30px 0 26px -24px rgba(0,0,0,0.45);   /* 제본 쪽 그늘 */
   overflow: hidden;
-  transform: rotate(-0.6deg);
 }
-.sketchbook::before {                  /* 종이 그레인 한 겹 더 */
-  content: ""; position: absolute; inset: 0; pointer-events: none;
+.sketchbook-page::before {             /* 종이 그레인 한 겹 더 */
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
   background-image: var(--grain);
-  opacity: 0.07; mix-blend-mode: overlay;
+  opacity: 0.08; mix-blend-mode: overlay;
 }
-/* 왼쪽 스프링 제본 구멍 */
-.sketchbook__rings {
-  position: absolute; top: 10px; bottom: 10px; left: 10px; width: 16px;
+.sketchbook-page > * { position: relative; z-index: 2; }
+/* .story 의 background/padding 단축 속성을 이긴다 */
+.story.sketchbook-page {
+  background-color: #67738c;
+  padding-left: 46px;
+}
+
+/* 왼쪽 스프링 제본 구멍 (섹션 전체 높이) */
+/* 결합 선택자로 .story > * / .sketchbook-page > * 의 position:relative 를 이긴다 */
+.sketchbook-page > .sketchbook__rings {
+  position: absolute; top: 18px; bottom: 18px; left: 12px; width: 18px;
   z-index: 3; pointer-events: none;
   background-image:
-    radial-gradient(circle, rgba(255,255,255,0.30) 0 5px, transparent 6px),
+    radial-gradient(circle, rgba(255,255,255,0.32) 0 5px, transparent 6px),
     radial-gradient(circle, rgba(18,16,14,0.55) 0 3px, transparent 3.6px);
-  background-size: 16px 26px, 16px 26px;
+  background-size: 18px 30px, 18px 30px;
   background-position: center 4px, center 4px;
 }
-/* 스케치북 안에서는 글씨를 흰색 손글씨로 (좁은 폭에 맞춰 살짝 작게) */
-.sketchbook .story__quote,
-.sketchbook .greeting__text { color: #f7f4ec; position: relative; z-index: 2; }
-.sketchbook .story__quote { font-size: 1.35rem; margin-bottom: 0; }
-.sketchbook .greeting__text { font-size: 1.24rem; line-height: 1.7; }
-.sketchbook .greeting__text span { color: #ffd0e0; }
-.sketchbook + .sketchbook { margin-top: -6px; }
+
+/* 페이지 위 글씨는 흰 손글씨로 */
+.sketchbook-page .story__quote,
+.sketchbook-page .greeting__text,
+.sketchbook-page .notice__text { color: #f7f4ec; }
+.sketchbook-page .story__quote { font-size: 1.34rem; }
+.sketchbook-page .greeting__text { font-size: 1.24rem; line-height: 1.72; }
+.sketchbook-page .greeting__text span { color: #ffd6e3; }
+.sketchbook-page .notice__text { font-size: 1.2rem; line-height: 1.65; }
+.sketchbook-page .notice__text + .notice__text { border-top-color: rgba(255,255,255,0.32); }
+
+/* 사진은 종이에 붙인 듯한 느낌 (흰 테두리 + 마스킹 테이프) */
+.sketchbook-page .polaroid { position: relative; box-shadow: 0 12px 24px rgba(0,0,0,0.32); }
+.sketchbook-page .polaroid::before,
+.sketchbook-page .letter-stage::before {
+  content: ""; position: absolute; top: -14px; left: 50%;
+  width: 86px; height: 26px; z-index: 5;
+  transform: translateX(-50%) rotate(-4deg);
+  background: rgba(247,244,236,0.55);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+}
+.sketchbook-page .letter-photo { box-shadow: 0 10px 22px rgba(0,0,0,0.3); }
 
 /* ===== Story (폴라로이드) ===== */
 .story { background: var(--cream-2); padding: 60px 26px; }
