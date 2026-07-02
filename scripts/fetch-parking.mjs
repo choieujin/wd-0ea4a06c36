@@ -180,15 +180,15 @@ lots.push({
 });
 
 // 이촌1~3
+// 이중주차가 가능해 주차가능대수가 총 주차면수를 넘을 수 있음(정상) → 가드 없이 그대로 표시.
 for (const [name, key] of [["이촌1주차장", "ichon1"], ["이촌2주차장", "ichon2"], ["이촌3주차장", "ichon3"]]) {
   const v = ichon?.[name];
-  const sane = v && v.available != null && v.total != null && v.available <= v.total;
   lots.push({
     id: key,
     name,
-    note: "한강공원",
+    note: "한강공원 · 이중주차 가능",
     ...(v && v.available != null
-      ? { total: v.total, available: v.available, status: sane ? statusOf(v.available, v.total) : "unknown", ok: true }
+      ? { total: v.total, available: v.available, status: statusOf(v.available, v.total), ok: true }
       : { total: null, available: null, status: "error", ok: false }),
   });
 }
