@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-02T22:53:05.620+09:00",
-  "elapsedMs": 3332,
+  "updatedAt": "2026-07-02T22:54:49.540+09:00",
+  "elapsedMs": 3761,
   "errors": [
-    "삼각지: HTTP 404"
+    "삼각지: 파싱 실패"
   ],
   "lots": [
     {
@@ -37,7 +37,7 @@
       "name": "이촌2주차장",
       "note": "한강공원",
       "total": 93,
-      "available": 65,
+      "available": 66,
       "status": "ok",
       "ok": true
     },
