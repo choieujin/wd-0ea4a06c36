@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-07-02T23:19:41.386+09:00",
-  "elapsedMs": 2587,
+  "updatedAt": "2026-07-02T23:32:16.791+09:00",
+  "elapsedMs": 111,
   "errors": [],
   "lots": [
     {
@@ -26,16 +26,16 @@
     {
       "id": "ichon1",
       "name": "이촌1주차장",
-      "note": "한강공원 · 이중주차 가능",
+      "note": "한강공원",
       "total": 32,
-      "available": 66,
+      "available": 68,
       "status": "ok",
       "ok": true
     },
     {
       "id": "ichon2",
       "name": "이촌2주차장",
-      "note": "한강공원 · 이중주차 가능",
+      "note": "한강공원",
       "total": 93,
       "available": 67,
       "status": "ok",
@@ -44,9 +44,9 @@
     {
       "id": "ichon3",
       "name": "이촌3주차장",
-      "note": "한강공원 · 이중주차 가능",
+      "note": "한강공원",
       "total": 160,
-      "available": 182,
+      "available": 190,
       "status": "ok",
       "ok": true
     }

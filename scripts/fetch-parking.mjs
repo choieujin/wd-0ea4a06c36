@@ -186,7 +186,7 @@ for (const [name, key] of [["이촌1주차장", "ichon1"], ["이촌2주차장", 
   lots.push({
     id: key,
     name,
-    note: "한강공원 · 이중주차 가능",
+    note: "한강공원",
     ...(v && v.available != null
       ? { total: v.total, available: v.available, status: statusOf(v.available, v.total), ok: true }
       : { total: null, available: null, status: "error", ok: false }),

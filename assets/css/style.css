@@ -526,44 +526,45 @@ section.paper + section.paper::after {
 }
 .park-notice__list strong { color: var(--ink); font-weight: 700; }
 
-/* 실시간 주차 현황 위젯 */
-.park-live { margin-top: 26px; text-align: left; }
+/* 실시간 주차 현황 위젯 — 핀터레스트풍 정돈 */
+.park-live { margin: 30px auto 0; max-width: 340px; text-align: left; }
 .park-live__title {
-  font-family: var(--hand); font-size: 1.25rem; color: #7a5a3c;
-  text-align: center; margin-bottom: 4px;
+  font-family: var(--sans); font-size: 0.8rem; font-weight: 700;
+  letter-spacing: 0.22em; color: #8a6f52; text-align: center; margin-bottom: 4px;
 }
 .park-live__updated {
-  text-align: center; font-size: 0.8rem; color: var(--ink-soft); margin-bottom: 14px;
+  text-align: center; font-size: 0.76rem; color: var(--ink-soft); margin-bottom: 16px;
 }
-.park-live__updated.is-stale { color: var(--orage); }
-.park-live__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.park-live__updated.is-stale { color: #b58a4a; }
+.park-live__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .park-card {
-  border: 1.5px solid var(--line); border-radius: 12px; background: #fff;
-  padding: 12px 15px; border-left-width: 5px;
+  border: 1px solid var(--line); border-radius: 4px; background: #fdfaf3;
+  padding: 13px 16px;
 }
-.park-card.is-ok { border-left-color: #37a06a; }
-.park-card.is-busy { border-left-color: var(--orage); }
-.park-card.is-full { border-left-color: var(--pink); }
-.park-card.is-unknown, .park-card.is-pending { border-left-color: var(--line); }
-.park-card__head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.park-card__name { font-weight: 700; color: var(--ink); font-size: 0.98rem; }
+.park-card__head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.park-card__name { font-weight: 700; color: var(--ink); font-size: 0.92rem; }
 .park-card__chip {
-  flex: none; font-size: 0.8rem; font-weight: 700; padding: 2px 10px; border-radius: 999px;
-  color: #fff; background: var(--line);
+  flex: none; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.03em;
+  color: var(--ink-soft); display: inline-flex; align-items: center; gap: 5px;
 }
-.is-ok .park-card__chip { background: #37a06a; }
-.is-busy .park-card__chip { background: var(--orage); }
-.is-full .park-card__chip { background: var(--pink); }
-.is-unknown .park-card__chip, .is-pending .park-card__chip { background: #b3aa95; }
-.park-card__nums { display: block; margin-top: 6px; font-size: 0.95rem; color: var(--ink); }
-.park-card__nums strong { color: var(--pink); font-size: 1.15rem; font-weight: 700; }
-.park-card__nums--muted { color: var(--ink-soft); font-size: 0.86rem; }
-.park-card.is-link { border-left-color: var(--sky); }
+.park-card__chip::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%; background: #b3aa95;
+}
+.is-ok .park-card__chip::before { background: #8aa06a; }
+.is-busy .park-card__chip::before { background: #c9a15a; }
+.is-full .park-card__chip::before { background: #c47f7f; }
+.park-card__nums { display: block; margin-top: 5px; font-size: 0.88rem; color: var(--ink-soft); }
+.park-card__nums strong { color: var(--ink); font-size: 1.05rem; font-weight: 700; }
+.park-card__nums--muted { color: var(--ink-soft); font-size: 0.82rem; }
 .park-card__link {
-  flex: none; font-size: 0.8rem; font-weight: 700; padding: 3px 12px; border-radius: 999px;
-  color: var(--sky-ink); background: var(--sky); text-decoration: none; white-space: nowrap;
+  flex: none; font-size: 0.76rem; font-weight: 600; color: #8a6f52;
+  text-decoration: none; white-space: nowrap;
+  border-bottom: 1px solid var(--line); padding-bottom: 1px;
 }
-.park-card__note { display: block; margin-top: 3px; font-size: 0.8rem; color: var(--ink-soft); }
+.park-card__note { display: block; margin-top: 2px; font-size: 0.76rem; color: var(--ink-soft); }
+.park-live__foot {
+  text-align: center; font-size: 0.74rem; color: var(--ink-soft); margin-top: 14px;
+}
 
 .walk-map { display: block; margin-top: 14px; }
 .walk-map img {
