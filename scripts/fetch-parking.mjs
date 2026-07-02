@@ -84,17 +84,39 @@ function statusOf(available, total) {
 
 // ── 삼각지 (용산구) ─────────────────────────────────────────────
 // <tr><th>삼각지</th><td>총면수</td><td>현재</td><td class="last">가용</td></tr>
-async function fetchSamgakji() {
-  const html = await getText("https://www.yong-san.or.kr/site/main/parking/infos", {
-    referer: "https://www.yong-san.or.kr/site/main/parking/info",
-  });
+// yong-san.or.kr은 일부 데이터센터 IP(GitHub Actions 등)를 404로 차단 → 프록시 폴백.
+const YONGSAN_URL = "https://www.yong-san.or.kr/site/main/parking/infos";
+
+function parseSamgakji(html) {
+  // HTML 테이블
   const m = html.match(
     /<th>\s*삼각지\s*<\/th>\s*<td>\s*([\d,]+)\s*<\/td>\s*<td>\s*([\d,]+)\s*<\/td>\s*<td[^>]*>\s*([\d,]+)\s*<\/td>/
   );
-  if (!m) throw new Error("삼각지 행 파싱 실패");
-  const total = toInt(m[1]);
-  const available = toInt(m[3]);
-  return { total, available };
+  if (m) return { total: toInt(m[1]), available: toInt(m[3]) };
+  // 마크다운 표(프록시 리더가 변환한 경우): | 삼각지 | 170 | 64 | 106 |
+  const md = html.match(/삼각지\s*\|\s*([\d,]+)\s*\|\s*([\d,]+)\s*\|\s*([\d,]+)/);
+  if (md) return { total: toInt(md[1]), available: toInt(md[3]) };
+  return null;
+}
+
+async function fetchSamgakji() {
+  const sources = [
+    () => getText(YONGSAN_URL, { referer: "https://www.yong-san.or.kr/site/main/parking/info" }),
+    () => getText("https://api.allorigins.win/raw?url=" + encodeURIComponent(YONGSAN_URL)),
+    () => getText("https://corsproxy.io/?url=" + encodeURIComponent(YONGSAN_URL)),
+    () => getText("https://r.jina.ai/" + YONGSAN_URL),
+  ];
+  let lastErr;
+  for (const get of sources) {
+    try {
+      const parsed = parseSamgakji(await get());
+      if (parsed && parsed.total != null) return parsed;
+      lastErr = new Error("파싱 실패");
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error("모든 소스 실패");
 }
 
 // ── 이촌1~3 (한강사업본부) ──────────────────────────────────────
