@@ -529,7 +529,7 @@ section.paper + section.paper::after {
 /* 실시간 주차 현황 위젯 */
 .park-live { margin-top: 26px; text-align: left; }
 .park-live__title {
-  font-family: var(--hand); font-size: 1.25rem; color: var(--pink);
+  font-family: var(--hand); font-size: 1.25rem; color: #7a5a3c;
   text-align: center; margin-bottom: 4px;
 }
 .park-live__updated {
