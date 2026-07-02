@@ -1,0 +1,46 @@
+name: 실시간 주차 현황 갱신
+
+# cron 은 UTC 기준. KST = UTC+9.
+#  - 평상시: 2시간마다
+#  - 결혼식 당일(10/25) 11:00~15:00 KST = 02:00~06:00 UTC: 10분 간격
+on:
+  schedule:
+    - cron: "0 */2 20-25 10 *" # 결혼식 주간(10/20~25) 2시간마다
+    - cron: "*/10 2-5 25 10 *" # 10/25 11:00~14:50 KST 10분 간격
+    - cron: "0 6 25 10 *"      # 10/25 15:00 KST 마지막 1회
+  workflow_dispatch:            # 수동 실행 버튼
+
+# 동시 실행 방지 (겹치는 cron 대비)
+concurrency:
+  group: parking
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 주차 현황 수집
+        env:
+          SEOUL_API_KEY: ${{ secrets.SEOUL_API_KEY }}
+        run: node scripts/fetch-parking.mjs
+
+      - name: 변경 시 커밋
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/data/parking.json
+          if git diff --staged --quiet; then
+            echo "변경 없음 — 커밋 생략"
+          else
+            git commit -m "chore: 실시간 주차 현황 갱신 [skip ci]"
+            git push
+          fi
