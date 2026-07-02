@@ -1,12 +1,54 @@
 {
-  "updatedAt": null,
-  "elapsedMs": 0,
-  "errors": [],
+  "updatedAt": "2026-07-02T22:53:05.620+09:00",
+  "elapsedMs": 3332,
+  "errors": [
+    "삼각지: HTTP 404"
+  ],
   "lots": [
-    { "id": "samgakji", "name": "삼각지역 임시주차장", "note": "전쟁기념관·대절버스 인근", "total": null, "available": null, "status": "pending", "ok": false },
-    { "id": "dongjak", "name": "동작대교 공영주차장", "note": "실시간 연동 준비중 (API 키 발급 후 활성화)", "total": null, "available": null, "status": "pending", "ok": false },
-    { "id": "ichon1", "name": "이촌1주차장", "note": "한강공원", "total": null, "available": null, "status": "pending", "ok": false },
-    { "id": "ichon2", "name": "이촌2주차장", "note": "한강공원", "total": null, "available": null, "status": "pending", "ok": false },
-    { "id": "ichon3", "name": "이촌3주차장", "note": "한강공원", "total": null, "available": null, "status": "pending", "ok": false }
+    {
+      "id": "samgakji",
+      "name": "삼각지역 임시주차장",
+      "note": "전쟁기념관·대절버스 인근",
+      "total": null,
+      "available": null,
+      "status": "error",
+      "ok": false
+    },
+    {
+      "id": "dongjak",
+      "name": "동작대교 공영주차장",
+      "note": "실시간 연동 준비중 (API 키 발급 후 활성화)",
+      "total": null,
+      "available": null,
+      "status": "pending",
+      "ok": false
+    },
+    {
+      "id": "ichon1",
+      "name": "이촌1주차장",
+      "note": "한강공원",
+      "total": 32,
+      "available": 62,
+      "status": "unknown",
+      "ok": true
+    },
+    {
+      "id": "ichon2",
+      "name": "이촌2주차장",
+      "note": "한강공원",
+      "total": 93,
+      "available": 65,
+      "status": "ok",
+      "ok": true
+    },
+    {
+      "id": "ichon3",
+      "name": "이촌3주차장",
+      "note": "한강공원",
+      "total": 160,
+      "available": 185,
+      "status": "unknown",
+      "ok": true
+    }
   ]
 }
