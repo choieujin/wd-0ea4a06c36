@@ -10,6 +10,15 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import https from "node:https";
+
+const BROWSER_HEADERS = {
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "ko-KR,ko;q=0.9,en;q=0.8",
+  "Accept-Encoding": "identity",
+};
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT = join(__dirname, "..", "assets", "data", "parking.json");
@@ -22,21 +31,40 @@ function nowKstISO() {
   return kst.toISOString().replace("Z", "+09:00");
 }
 
-async function getText(url, { insecure = false } = {}) {
-  // 인증서 만료 사이트(한강)를 위한 우회
-  if (insecure) process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+// 인증서 만료 사이트(한강)용 — fetch/undici는 rejectUnauthorized 우회가 까다로워 node:https 사용.
+// node:https는 리다이렉트를 자동으로 안 따라가므로 직접 처리.
+function httpsGetInsecure(url, headers, hops = 0) {
+  return new Promise((resolve, reject) => {
+    if (hops > 5) return reject(new Error("too many redirects"));
+    const req = https.get(url, { headers, rejectUnauthorized: false, timeout: TIMEOUT }, (res) => {
+      const { statusCode, headers: h } = res;
+      if (statusCode >= 300 && statusCode < 400 && h.location) {
+        res.resume();
+        const next = new URL(h.location, url).toString();
+        return resolve(httpsGetInsecure(next, headers, hops + 1));
+      }
+      if (statusCode >= 400) { res.resume(); return reject(new Error(`HTTP ${statusCode}`)); }
+      let data = "";
+      res.setEncoding("utf8");
+      res.on("data", (c) => (data += c));
+      res.on("end", () => resolve(data));
+    });
+    req.on("timeout", () => req.destroy(new Error("timeout")));
+    req.on("error", reject);
+  });
+}
+
+async function getText(url, { insecure = false, referer } = {}) {
+  const headers = referer ? { ...BROWSER_HEADERS, Referer: referer } : BROWSER_HEADERS;
+  if (insecure) return httpsGetInsecure(url, headers);
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), TIMEOUT);
   try {
-    const res = await fetch(url, {
-      signal: ctrl.signal,
-      headers: { "User-Agent": "Mozilla/5.0 (wedding-parking-bot)" },
-    });
+    const res = await fetch(url, { signal: ctrl.signal, redirect: "follow", headers });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.text();
   } finally {
     clearTimeout(t);
-    if (insecure) delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
   }
 }
 
@@ -57,7 +85,9 @@ function statusOf(available, total) {
 // ── 삼각지 (용산구) ─────────────────────────────────────────────
 // <tr><th>삼각지</th><td>총면수</td><td>현재</td><td class="last">가용</td></tr>
 async function fetchSamgakji() {
-  const html = await getText("https://www.yong-san.or.kr/site/main/parking/infos");
+  const html = await getText("https://www.yong-san.or.kr/site/main/parking/infos", {
+    referer: "https://www.yong-san.or.kr/site/main/parking/info",
+  });
   const m = html.match(
     /<th>\s*삼각지\s*<\/th>\s*<td>\s*([\d,]+)\s*<\/td>\s*<td>\s*([\d,]+)\s*<\/td>\s*<td[^>]*>\s*([\d,]+)\s*<\/td>/
   );
@@ -70,7 +100,10 @@ async function fetchSamgakji() {
 // ── 이촌1~3 (한강사업본부) ──────────────────────────────────────
 // 열: 주차장명 | 주소 | 길찾기 | 주차가능대수(가용) | 주차구획수(계)(총) | 면적
 async function fetchIchon() {
-  const html = await getText("https://ihangangpark.kr/parking/region/region6", { insecure: true });
+  const html = await getText("https://ihangangpark.kr/parking/region/region6", {
+    insecure: true,
+    referer: "https://ihangangpark.kr/",
+  });
   const out = {};
   for (const name of ["이촌1주차장", "이촌2주차장", "이촌3주차장"]) {
     // 행 블록 추출 후 숫자 셀만 순서대로 수집
