@@ -34,5 +34,5 @@ window.GALLERY = [
   "IMG_9948.webp",
   "IMG_9951.webp",
   "IMG_9952.webp",
-  "P1100560.webp",
+  "IMG_9953.webp",
 ];
