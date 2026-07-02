@@ -16,6 +16,7 @@ concurrency:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   update:
@@ -33,6 +34,7 @@ jobs:
         run: node scripts/fetch-parking.mjs
 
       - name: 변경 시 커밋
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -42,4 +44,12 @@ jobs:
           else
             git commit -m "chore: 실시간 주차 현황 갱신 [skip ci]"
             git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+
+      # GITHUB_TOKEN 푸시는 push 워크플로를 트리거하지 않으므로 배포를 직접 실행
+      - name: Pages 재배포 트리거
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main
