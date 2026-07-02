@@ -30,6 +30,18 @@
   }
 
   function card(lot) {
+    // 링크 카드 (자동 수집 불가 → 하객이 직접 확인)
+    if (lot.status === "link" && lot.link) {
+      return (
+        '<li class="park-card is-link">' +
+          '<div class="park-card__head">' +
+            '<span class="park-card__name">' + lot.name + '</span>' +
+            '<a class="park-card__link" href="' + lot.link + '" target="_blank" rel="noopener">' + (lot.linkLabel || "확인 →") + '</a>' +
+          '</div>' +
+          (lot.note ? '<span class="park-card__note">' + lot.note + '</span>' : '') +
+        '</li>'
+      );
+    }
     var s = STATUS[lot.status] || STATUS.unknown;
     var showNums = lot.ok && lot.available != null && lot.total != null && (lot.status === "ok" || lot.status === "busy" || lot.status === "full");
     var nums = showNums

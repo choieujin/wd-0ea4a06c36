@@ -558,6 +558,11 @@ section.paper + section.paper::after {
 .park-card__nums { display: block; margin-top: 6px; font-size: 0.95rem; color: var(--ink); }
 .park-card__nums strong { color: var(--pink); font-size: 1.15rem; font-weight: 700; }
 .park-card__nums--muted { color: var(--ink-soft); font-size: 0.86rem; }
+.park-card.is-link { border-left-color: var(--sky); }
+.park-card__link {
+  flex: none; font-size: 0.8rem; font-weight: 700; padding: 3px 12px; border-radius: 999px;
+  color: var(--sky-ink); background: var(--sky); text-decoration: none; white-space: nowrap;
+}
 .park-card__note { display: block; margin-top: 3px; font-size: 0.8rem; color: var(--ink-soft); }
 
 .walk-map { display: block; margin-top: 14px; }

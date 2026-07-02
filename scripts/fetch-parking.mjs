@@ -83,41 +83,9 @@ function statusOf(available, total) {
 }
 
 // ── 삼각지 (용산구) ─────────────────────────────────────────────
-// <tr><th>삼각지</th><td>총면수</td><td>현재</td><td class="last">가용</td></tr>
-// yong-san.or.kr은 일부 데이터센터 IP(GitHub Actions 등)를 404로 차단 → 프록시 폴백.
-const YONGSAN_URL = "https://www.yong-san.or.kr/site/main/parking/infos";
-
-function parseSamgakji(html) {
-  // HTML 테이블
-  const m = html.match(
-    /<th>\s*삼각지\s*<\/th>\s*<td>\s*([\d,]+)\s*<\/td>\s*<td>\s*([\d,]+)\s*<\/td>\s*<td[^>]*>\s*([\d,]+)\s*<\/td>/
-  );
-  if (m) return { total: toInt(m[1]), available: toInt(m[3]) };
-  // 마크다운 표(프록시 리더가 변환한 경우): | 삼각지 | 170 | 64 | 106 |
-  const md = html.match(/삼각지\s*\|\s*([\d,]+)\s*\|\s*([\d,]+)\s*\|\s*([\d,]+)/);
-  if (md) return { total: toInt(md[1]), available: toInt(md[3]) };
-  return null;
-}
-
-async function fetchSamgakji() {
-  const sources = [
-    () => getText(YONGSAN_URL, { referer: "https://www.yong-san.or.kr/site/main/parking/info" }),
-    () => getText("https://api.allorigins.win/raw?url=" + encodeURIComponent(YONGSAN_URL)),
-    () => getText("https://corsproxy.io/?url=" + encodeURIComponent(YONGSAN_URL)),
-    () => getText("https://r.jina.ai/" + YONGSAN_URL),
-  ];
-  let lastErr;
-  for (const get of sources) {
-    try {
-      const parsed = parseSamgakji(await get());
-      if (parsed && parsed.total != null) return parsed;
-      lastErr = new Error("파싱 실패");
-    } catch (e) {
-      lastErr = e;
-    }
-  }
-  throw lastErr || new Error("모든 소스 실패");
-}
+// yong-san.or.kr은 데이터센터/해외 IP를 404로 차단해 러너·프록시에서 수집 불가.
+// → 자동 수집 대신 하객이 직접 보는 링크 카드로 제공.
+const SAMGAKJI_LINK = "https://www.yong-san.or.kr/site/main/parking/infos";
 
 // ── 이촌1~3 (한강사업본부) ──────────────────────────────────────
 // 열: 주차장명 | 주소 | 길찾기 | 주차가능대수(가용) | 주차구획수(계)(총) | 면적
@@ -182,20 +150,22 @@ async function tryFetch(label, fn) {
 
 const t0 = Date.now();
 
-const [samgakji, ichon, dongjak] = await Promise.all([
-  tryFetch("삼각지", fetchSamgakji),
+const [ichon, dongjak] = await Promise.all([
   tryFetch("이촌", fetchIchon),
   tryFetch("동작대교(API)", fetchDongjak),
 ]);
 
-// 삼각지
+// 삼각지 — 자동 수집 불가(IP 차단) → 링크 카드
 lots.push({
   id: "samgakji",
   name: "삼각지역 임시주차장",
   note: "전쟁기념관·대절버스 인근",
-  ...(samgakji
-    ? { total: samgakji.total, available: samgakji.available, status: statusOf(samgakji.available, samgakji.total), ok: true }
-    : { total: null, available: null, status: "error", ok: false }),
+  status: "link",
+  link: SAMGAKJI_LINK,
+  linkLabel: "현장 실시간 확인 →",
+  total: null,
+  available: null,
+  ok: false,
 });
 
 // 동작대교 (API 키 없으면 pending)
