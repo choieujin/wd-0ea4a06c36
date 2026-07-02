@@ -1,7 +1,10 @@
 {
-  "updatedAt": null,
-  "elapsedMs": 0,
-  "errors": [],
+  "updatedAt": "2026-07-02T22:47:39.946+09:00",
+  "elapsedMs": 10555,
+  "errors": [
+    "삼각지: HTTP 404",
+    "이촌: fetch failed"
+  ],
   "lots": [
     {
       "id": "samgakji",
@@ -9,7 +12,7 @@
       "note": "전쟁기념관·대절버스 인근",
       "total": null,
       "available": null,
-      "status": "pending",
+      "status": "error",
       "ok": false
     },
     {
@@ -27,7 +30,7 @@
       "note": "한강공원",
       "total": null,
       "available": null,
-      "status": "pending",
+      "status": "error",
       "ok": false
     },
     {
@@ -36,7 +39,7 @@
       "note": "한강공원",
       "total": null,
       "available": null,
-      "status": "pending",
+      "status": "error",
       "ok": false
     },
     {
@@ -45,7 +48,7 @@
       "note": "한강공원",
       "total": null,
       "available": null,
-      "status": "pending",
+      "status": "error",
       "ok": false
     }
   ]
