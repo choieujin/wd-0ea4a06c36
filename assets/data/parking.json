@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-07-02T23:01:26.237+09:00",
-  "elapsedMs": 3105,
+  "updatedAt": "2026-07-02T23:08:48.517+09:00",
+  "elapsedMs": 2438,
   "errors": [],
   "lots": [
     {
@@ -28,7 +28,7 @@
       "name": "이촌1주차장",
       "note": "한강공원",
       "total": 32,
-      "available": 63,
+      "available": 64,
       "status": "unknown",
       "ok": true
     },
