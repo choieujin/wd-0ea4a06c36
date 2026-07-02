@@ -500,66 +500,86 @@ section.paper + section.paper::after {
 .info-block p + p { margin-top: 4px; }
 .info-block strong { color: var(--pink); font-weight: 700; }
 
-.park-notice {
-  margin: 26px auto 0; max-width: 340px; padding: 22px 24px;
-  border: 1px solid var(--line); border-radius: 4px;
-  background: #fdfaf3; text-align: left;
+/* ===== 주차 안내 — 블랙&핑크 마커 표기 ===== */
+.park-notice, .park-live {
+  position: relative; margin: 30px auto 0; max-width: 340px;
+  background: transparent; border: none; text-align: left;
 }
-.park-notice__title {
-  font-family: var(--sans); font-size: 0.78rem; font-weight: 700;
-  letter-spacing: 0.22em; color: var(--ink-soft);
-  text-align: center; margin-bottom: 12px;
+.park-notice { padding: 26px 24px 24px; }
+.park-live { margin-top: 22px; padding: 26px 22px 22px; }
+/* 잡지에서 뜯어 붙인 듯한 찢긴 종이 가장자리 */
+.park-notice::before, .park-live::before {
+  content: ""; position: absolute; inset: 3px;
+  background: #fdf8ee; border: 2px solid #a7a094;
+  filter: url(#torn-edge) drop-shadow(2px 4px 0 rgba(20,18,16,0.1));
+  z-index: 0;
 }
-.park-notice__lead {
-  font-size: 0.86rem; color: var(--ink-soft); line-height: 1.65;
-  text-align: center; margin-bottom: 16px;
-  padding-bottom: 15px; border-bottom: 1px solid var(--line);
+.park-notice > *, .park-live > * { position: relative; z-index: 1; }
+/* 찢긴 핑크 테이프 라벨 — 흰 볼드 글씨 (그런지 포스터 느낌) */
+.park-notice__title, .park-live__title {
+  position: relative; display: table; margin: 4px auto 16px;
+  font-family: var(--sans); font-size: 1.05rem; font-weight: 800;
+  letter-spacing: 0.05em; color: #fff; padding: 7px 18px;
+  transform: rotate(-2.5deg);
+  text-shadow: 1px 1px 0 rgba(20,18,16,0.28);
 }
-.park-notice__list { list-style: none; padding: 0; margin: 0; }
-.park-notice__list li {
-  position: relative; padding: 6px 0 6px 16px;
-  font-size: 0.9rem; color: var(--ink); line-height: 1.6;
+.park-notice__title::before, .park-live__title::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: var(--pink);
+  filter: url(#torn-edge) drop-shadow(3px 3px 0 rgba(20,18,16,0.2));
 }
-.park-notice__list li::before {
-  content: ""; position: absolute; left: 2px; top: 0.82em;
-  width: 4px; height: 1px; background: var(--ink-soft);
+/* 거친 핑크 박스 위 흰 띠 (그런지 포스터 박스 느낌) */
+.park-notice__lines {
+  position: relative; margin-top: 4px;
+  padding: 14px 18px; display: grid; gap: 3px;
 }
-.park-notice__list strong { color: var(--ink); font-weight: 700; }
+.park-notice__lines::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: var(--pink);
+  filter: url(#torn-edge) drop-shadow(3px 3px 0 rgba(20,18,16,0.16));
+}
+.park-notice__line {
+  padding: 3px 0; text-align: left;
+  font-size: 0.92rem; color: #fff; line-height: 1.55;
+  text-shadow: 0 1px 1px rgba(20,18,16,0.18);
+}
+/* 강조 키워드 — 굵은 흰색 */
+.park-notice__line strong { color: #fff; font-weight: 800; }
 
-/* 실시간 주차 현황 위젯 — 핀터레스트풍 정돈 */
-.park-live { margin: 30px auto 0; max-width: 340px; text-align: left; }
-.park-live__title {
-  font-family: var(--sans); font-size: 0.8rem; font-weight: 700;
-  letter-spacing: 0.22em; color: #8a6f52; text-align: center; margin-bottom: 4px;
-}
+/* ===== 실시간 주차 현황 — 블랙&핑크 ===== */
+.park-live__title { margin-bottom: 4px; transform: rotate(-1.5deg); }
 .park-live__updated {
   text-align: center; font-size: 0.76rem; color: var(--ink-soft); margin-bottom: 16px;
 }
-.park-live__updated.is-stale { color: #b58a4a; }
-.park-live__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.park-live__updated.is-stale { color: var(--pink); }
+.park-live__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 9px; }
 .park-card {
-  border: 1px solid var(--line); border-radius: 4px; background: #fdfaf3;
-  padding: 13px 16px;
+  border: 1.5px solid #b5aea1; border-radius: 5px; background: #fff;
+  padding: 12px 14px; box-shadow: 2px 2px 0 rgba(20,18,16,0.08);
 }
 .park-card__head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-.park-card__name { font-weight: 700; color: var(--ink); font-size: 0.92rem; }
+.park-card__name { font-weight: 800; color: var(--black); font-size: 0.92rem; }
 .park-card__chip {
-  flex: none; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.03em;
-  color: var(--ink-soft); display: inline-flex; align-items: center; gap: 5px;
+  flex: none; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.02em;
+  color: var(--black); padding: 2px 9px; border-radius: 20px;
+  border: 1.5px solid #b5aea1; background: #fff;
+  display: inline-flex; align-items: center; gap: 5px;
 }
 .park-card__chip::before {
   content: ""; width: 6px; height: 6px; border-radius: 50%; background: #b3aa95;
 }
-.is-ok .park-card__chip::before { background: #8aa06a; }
-.is-busy .park-card__chip::before { background: #c9a15a; }
-.is-full .park-card__chip::before { background: #c47f7f; }
+.is-ok .park-card__chip::before { background: var(--pink); }
+.is-busy .park-card__chip { background: var(--pink-soft); }
+.is-busy .park-card__chip::before { background: var(--black); }
+.is-full .park-card__chip { background: var(--black); color: #fff; }
+.is-full .park-card__chip::before { background: var(--pink); }
 .park-card__nums { display: block; margin-top: 5px; font-size: 0.88rem; color: var(--ink-soft); }
-.park-card__nums strong { color: var(--ink); font-size: 1.05rem; font-weight: 700; }
+.park-card__nums strong { color: var(--black); font-size: 1.05rem; font-weight: 800; }
 .park-card__nums--muted { color: var(--ink-soft); font-size: 0.82rem; }
 .park-card__link {
-  flex: none; font-size: 0.76rem; font-weight: 600; color: #8a6f52;
+  flex: none; font-size: 0.75rem; font-weight: 800; color: var(--pink);
   text-decoration: none; white-space: nowrap;
-  border-bottom: 1px solid var(--line); padding-bottom: 1px;
+  border-bottom: 2px solid var(--pink-soft); padding-bottom: 1px;
 }
 .park-card__note { display: block; margin-top: 2px; font-size: 0.76rem; color: var(--ink-soft); }
 .park-live__foot {

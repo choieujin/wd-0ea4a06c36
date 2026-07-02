@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@300;400;500;700&family=Pinyon+Script&family=Parisienne&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/style.css?v=23" />
+  <link rel="stylesheet" href="assets/css/style.css?v=24" />
 </head>
 <body>
 
@@ -183,29 +183,20 @@
       <p class="notice__text">화환은 공간 특성상 정중히 사양합니다.<br />마음만 감사히 받겠습니다.</p>
     </section>
 
+    <!-- 찢어진 종이 가장자리 필터 -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+      <filter id="torn-edge" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.022 0.07" numOctaves="5" seed="7" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
+
     <!-- ===== 오시는 길 ===== -->
     <section class="location reveal paper">
       <p class="script-label">Location</p>
       <h2 class="section-title">오시는 길</h2>
       <p class="location__name">용산가족공원</p>
       <p class="location__addr">서울특별시 용산구 서빙고로 137</p>
-
-      <div class="park-notice">
-        <p class="park-notice__title">주차 안내</p>
-        <p class="park-notice__lead">예식장 주변 주차장이 매우 혼잡합니다.<br />아래 방법을 이용해 주세요.</p>
-        <ul class="park-notice__list">
-          <li><strong>대중교통</strong> 이용을 가장 권장드립니다</li>
-          <li><strong>용산 전쟁기념관</strong> 주차 후 대절버스 탑승</li>
-          <li><strong>동작대교 남단 주차장</strong> 이용</li>
-        </ul>
-      </div>
-
-      <div class="park-live" id="parkLive" data-src="assets/data/parking.json">
-        <h3 class="park-live__title">실시간 주차 현황</h3>
-        <p class="park-live__updated" id="parkUpdated">불러오는 중…</p>
-        <ul class="park-live__list" id="parkList"></ul>
-        <p class="park-live__foot">현장 상황과 5~10분 차이가 있을 수 있어요.</p>
-      </div>
 
       <div class="info-block">
         <h3>지하철</h3>
@@ -232,6 +223,24 @@
           <img src="assets/images/walk-map.jpg" alt="국립중앙박물관에서 용산가족공원까지 도보 약도" loading="lazy"
                onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='assets/images/walk-map.png';this.closest('a').href='assets/images/walk-map.png';}else{document.getElementById('walkMapBlock').style.display='none';}" />
         </a>
+      </div>
+
+      <div class="park-notice">
+        <p class="park-notice__title">주차 안내</p>
+        <div class="park-notice__lines">
+          <p class="park-notice__line">예식장 주변 주차장이 혼잡합니다.</p>
+          <p class="park-notice__line"><strong>대중교통</strong> 이용을 권장드리며,</p>
+          <p class="park-notice__line"><strong>용산 전쟁기념관</strong> 주차 후 대절버스,</p>
+          <p class="park-notice__line">또는 <strong>인근 여유 주차장</strong>을</p>
+          <p class="park-notice__line">이용해 주세요.</p>
+        </div>
+      </div>
+
+      <div class="park-live" id="parkLive" data-src="assets/data/parking.json">
+        <h3 class="park-live__title">실시간 주차 현황</h3>
+        <p class="park-live__updated" id="parkUpdated">불러오는 중…</p>
+        <ul class="park-live__list" id="parkList"></ul>
+        <p class="park-live__foot">결혼식 당일 10분 간격으로 업데이트될 예정입니다.</p>
       </div>
     </section>
 
