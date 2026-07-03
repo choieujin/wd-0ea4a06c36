@@ -83,9 +83,45 @@ function statusOf(available, total) {
 }
 
 // ── 삼각지 (용산구) ─────────────────────────────────────────────
-// yong-san.or.kr은 데이터센터/해외 IP를 404로 차단해 러너·프록시에서 수집 불가.
-// → 자동 수집 대신 하객이 직접 보는 링크 카드로 제공.
+// <tr><th>삼각지</th><td>총면수</td><td>현재</td><td class="last">가용</td></tr>
+// yong-san.or.kr은 데이터센터 IP를 404로 막는 경우가 있어 프록시 폴백을 둔다.
+// 모두 실패하면 assembly에서 링크 카드로 폴백.
 const SAMGAKJI_LINK = "https://www.yong-san.or.kr/site/main/parking/infos";
+
+function parseSamgakji(html) {
+  const m = html.match(
+    /<th>\s*삼각지\s*<\/th>\s*<td>\s*([\d,]+)\s*<\/td>\s*<td>\s*([\d,]+)\s*<\/td>\s*<td[^>]*>\s*([\d,]+)\s*<\/td>/
+  );
+  if (m) return { total: toInt(m[1]), available: toInt(m[3]) };
+  // 프록시 리더가 표를 텍스트/마크다운으로 바꾼 경우: 삼각지 170 64 106
+  const t = html.match(/삼각지[^\d]{0,12}([\d,]+)[^\d]{1,6}([\d,]+)[^\d]{1,6}([\d,]+)/);
+  if (t) return { total: toInt(t[1]), available: toInt(t[3]) };
+  return null;
+}
+
+async function fetchSamgakji() {
+  const enc = encodeURIComponent(SAMGAKJI_LINK);
+  const sources = [
+    () => getText(SAMGAKJI_LINK, { referer: "https://www.yong-san.or.kr/" }),
+    () => getText("https://api.codetabs.com/v1/proxy/?quest=" + enc),
+    () => getText("https://api.allorigins.win/raw?url=" + enc),
+    () => getText("https://api.allorigins.win/get?url=" + enc)
+            .then((t) => { try { return JSON.parse(t).contents || ""; } catch { return t; } }),
+    () => getText("https://thingproxy.freeboard.io/fetch/" + SAMGAKJI_LINK),
+    () => getText("https://r.jina.ai/" + SAMGAKJI_LINK),
+  ];
+  let lastErr;
+  for (const get of sources) {
+    try {
+      const p = parseSamgakji(await get());
+      if (p && p.total != null) return p;
+      lastErr = new Error("파싱 실패");
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error("모든 소스 실패");
+}
 
 // ── 이촌1~3 (한강사업본부) ──────────────────────────────────────
 // 열: 주차장명 | 주소 | 길찾기 | 주차가능대수(가용) | 주차구획수(계)(총) | 면적
@@ -150,22 +186,22 @@ async function tryFetch(label, fn) {
 
 const t0 = Date.now();
 
-const [ichon, dongjak] = await Promise.all([
+const [samgakji, ichon, dongjak] = await Promise.all([
+  tryFetch("삼각지", fetchSamgakji),
   tryFetch("이촌", fetchIchon),
   tryFetch("동작대교(API)", fetchDongjak),
 ]);
 
-// 삼각지 — 자동 수집 불가(IP 차단) → 링크 카드
+// 삼각지 — 파싱 성공 시 숫자 카드, 실패 시(IP 차단 등) 링크 카드
 lots.push({
   id: "samgakji",
   name: "삼각지역 임시주차장",
   note: "전쟁기념관·대절버스 인근",
-  status: "link",
   link: SAMGAKJI_LINK,
   linkLabel: "현장 실시간 확인 →",
-  total: null,
-  available: null,
-  ok: false,
+  ...(samgakji
+    ? { total: samgakji.total, available: samgakji.available, status: statusOf(samgakji.available, samgakji.total), ok: true }
+    : { total: null, available: null, status: "link", ok: false }),
 });
 
 // 동작대교 (API 키 없으면 pending)
