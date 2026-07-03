@@ -30,33 +30,41 @@
   }
 
   function card(lot) {
-    // 링크 카드 (자동 수집 불가 → 하객이 직접 확인)
-    if (lot.status === "link" && lot.link) {
+    var isLink = lot.status === "link";
+    var s = STATUS[lot.status] || STATUS.unknown;
+    var cls = isLink ? "is-link" : s.cls;
+
+    // 우측: 링크 카드는 라벨, 그 외는 상태 칩
+    var right = isLink
+      ? '<span class="park-card__go">' + (lot.linkLabel || "바로가기 →") + '</span>'
+      : '<span class="park-card__chip">' + s.label + '</span>';
+
+    // 본문: 숫자(가용/총) 또는 안내 문구
+    var showNums = lot.ok && lot.available != null && lot.total != null && (lot.status === "ok" || lot.status === "busy" || lot.status === "full");
+    var body = isLink
+      ? (lot.note ? '<span class="park-card__note">' + lot.note + '</span>' : '')
+      : (showNums
+          ? '<span class="park-card__nums"><strong>' + lot.available + '</strong> / ' + lot.total + '면</span>' +
+            (lot.note ? '<span class="park-card__note">' + lot.note + '</span>' : '')
+          : '<span class="park-card__nums park-card__nums--muted">' + (lot.note || "") + '</span>');
+
+    var inner =
+      '<div class="park-card__head">' +
+        '<span class="park-card__name">' + lot.name + '</span>' +
+        right +
+      '</div>' + body;
+
+    // 링크가 있으면 카드 전체를 탭 가능하게
+    if (lot.link) {
       return (
-        '<li class="park-card is-link">' +
-          '<div class="park-card__head">' +
-            '<span class="park-card__name">' + lot.name + '</span>' +
-            '<a class="park-card__link" href="' + lot.link + '" target="_blank" rel="noopener">' + (lot.linkLabel || "확인 →") + '</a>' +
-          '</div>' +
-          (lot.note ? '<span class="park-card__note">' + lot.note + '</span>' : '') +
+        '<li class="park-card ' + cls + ' is-clickable">' +
+          '<a class="park-card__hit" href="' + lot.link + '" target="_blank" rel="noopener">' +
+            inner +
+          '</a>' +
         '</li>'
       );
     }
-    var s = STATUS[lot.status] || STATUS.unknown;
-    var showNums = lot.ok && lot.available != null && lot.total != null && (lot.status === "ok" || lot.status === "busy" || lot.status === "full");
-    var nums = showNums
-      ? '<span class="park-card__nums"><strong>' + lot.available + '</strong> / ' + lot.total + '면</span>'
-      : '<span class="park-card__nums park-card__nums--muted">' + (lot.note || "") + '</span>';
-    return (
-      '<li class="park-card ' + s.cls + '">' +
-        '<div class="park-card__head">' +
-          '<span class="park-card__name">' + lot.name + '</span>' +
-          '<span class="park-card__chip">' + s.label + '</span>' +
-        '</div>' +
-        nums +
-        (showNums && lot.note ? '<span class="park-card__note">' + lot.note + '</span>' : '') +
-      '</li>'
-    );
+    return '<li class="park-card ' + cls + '">' + inner + '</li>';
   }
 
   function render(data) {
