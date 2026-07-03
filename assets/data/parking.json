@@ -1,37 +1,25 @@
 {
-  "updatedAt": "2026-07-03T16:23:54.025+09:00",
-  "elapsedMs": 58458,
-  "errors": [
-    "삼각지: 파싱 실패"
-  ],
+  "updatedAt": "2026-07-03T17:40:27.621+09:00",
+  "elapsedMs": 126,
+  "errors": [],
   "lots": [
     {
       "id": "samgakji",
       "name": "삼각지역 임시주차장",
       "note": "전쟁기념관·대절버스 인근",
+      "status": "link",
       "link": "https://www.yong-san.or.kr/site/main/parking/infos",
       "linkLabel": "현장 실시간 확인 →",
       "total": null,
       "available": null,
-      "status": "link",
       "ok": false
-    },
-    {
-      "id": "dongjak",
-      "name": "동작대교 공영주차장",
-      "note": "실시간 연동 준비중 (API 키 발급 후 활성화)",
-      "total": null,
-      "available": null,
-      "status": "pending",
-      "ok": false,
-      "link": "https://parking.seoul.go.kr"
     },
     {
       "id": "ichon1",
       "name": "이촌1주차장",
       "note": "한강공원",
       "total": 32,
-      "available": 7,
+      "available": 15,
       "status": "ok",
       "ok": true,
       "link": "https://ihangangpark.kr/parking/region/region6"
@@ -41,8 +29,8 @@
       "name": "이촌2주차장",
       "note": "한강공원",
       "total": 93,
-      "available": 7,
-      "status": "busy",
+      "available": 41,
+      "status": "ok",
       "ok": true,
       "link": "https://ihangangpark.kr/parking/region/region6"
     },
@@ -51,7 +39,7 @@
       "name": "이촌3주차장",
       "note": "한강공원",
       "total": 160,
-      "available": 108,
+      "available": 114,
       "status": "ok",
       "ok": true,
       "link": "https://ihangangpark.kr/parking/region/region6"

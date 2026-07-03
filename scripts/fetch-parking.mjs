@@ -5,7 +5,6 @@
 // 소스
 //   삼각지  : 용산구 시설관리 (HTML 테이블 파싱)           — 인증키 불필요
 //   이촌1~3 : 한강사업본부 ihangangpark.kr (HTML 파싱)      — 인증키 불필요, TLS 인증서 만료 → 검증 우회
-//   동작대교: 서울시 시영주차장 실시간 API (OA-21709)        — SEOUL_API_KEY 필요, 없으면 pending 유지
 
 import { writeFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -109,28 +108,6 @@ async function fetchIchon() {
   return out;
 }
 
-// ── 동작대교 (서울시 시영 실시간 API, OA-21709) ─────────────────
-// 키가 있어야 활성화. 없으면 null 반환 → pending 유지.
-async function fetchDongjak() {
-  const KEY = process.env.SEOUL_API_KEY;
-  if (!KEY) return null;
-  // 실시간 주차대수 서비스명은 발급 문서에 맞춰 조정 필요 (자리만 확보)
-  const url = `http://openapi.seoul.go.kr:8088/${KEY}/json/GetParkingInfo/1/1000/`;
-  const txt = await getText(url);
-  const data = JSON.parse(txt);
-  const rows = data?.GetParkingInfo?.row || [];
-  const pick = (kw) => rows.find((r) => (r.PKLT_NM || r.PARKING_NAME || "").includes(kw));
-  const map = (r) => r && {
-    total: toInt(r.TPKCT ?? r.TOTAL),
-    available: (() => {
-      const t = toInt(r.TPKCT ?? r.TOTAL);
-      const now = toInt(r.NOW_PRK_VHCL_CNT ?? r.CUR_PARKING);
-      return t != null && now != null ? Math.max(t - now, 0) : null;
-    })(),
-  };
-  return { 동작대교: map(pick("동작대교")), 동작주차공원: map(pick("동작주차공원")) };
-}
-
 // ── 조립 ────────────────────────────────────────────────────────
 const lots = [];
 const errors = [];
@@ -150,10 +127,7 @@ async function tryFetch(label, fn) {
 
 const t0 = Date.now();
 
-const [ichon, dongjak] = await Promise.all([
-  tryFetch("이촌", fetchIchon),
-  tryFetch("동작대교(API)", fetchDongjak),
-]);
+const ichon = await tryFetch("이촌", fetchIchon);
 
 // 삼각지 — 자동 수집 불가(IP 차단) → 링크 카드
 lots.push({
@@ -166,18 +140,6 @@ lots.push({
   total: null,
   available: null,
   ok: false,
-});
-
-// 동작대교 (API 키 없으면 pending)
-const dj = dongjak?.동작대교;
-lots.push({
-  id: "dongjak",
-  name: "동작대교 공영주차장",
-  note: dongjak ? "" : "실시간 연동 준비중 (API 키 발급 후 활성화)",
-  ...(dj
-    ? { total: dj.total, available: dj.available, status: statusOf(dj.available, dj.total), ok: true }
-    : { total: null, available: null, status: "pending", ok: false }),
-  link: "https://parking.seoul.go.kr",
 });
 
 // 이촌1~3
