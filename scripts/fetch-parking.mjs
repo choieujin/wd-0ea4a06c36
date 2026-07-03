@@ -177,7 +177,7 @@ lots.push({
   ...(dj
     ? { total: dj.total, available: dj.available, status: statusOf(dj.available, dj.total), ok: true }
     : { total: null, available: null, status: "pending", ok: false }),
-  link: "https://map.naver.com/p/search/동작대교공영주차장",
+  link: "https://parking.seoul.go.kr",
 });
 
 // 이촌1~3
@@ -191,7 +191,7 @@ for (const [name, key] of [["이촌1주차장", "ichon1"], ["이촌2주차장", 
     ...(v && v.available != null
       ? { total: v.total, available: v.available, status: statusOf(v.available, v.total), ok: true }
       : { total: null, available: null, status: "error", ok: false }),
-    link: `https://map.naver.com/p/search/${name}`,
+    link: "https://ihangangpark.kr/parking/region/region6",
   });
 }
 

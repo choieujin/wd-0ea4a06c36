@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-07-02T23:32:16.791+09:00",
-  "elapsedMs": 111,
+  "updatedAt": "2026-07-03T16:03:02.016+09:00",
+  "elapsedMs": 138,
   "errors": [],
   "lots": [
     {
@@ -22,37 +22,37 @@
       "available": null,
       "status": "pending",
       "ok": false,
-      "link": "https://map.naver.com/p/search/동작대교공영주차장"
+      "link": "https://parking.seoul.go.kr"
     },
     {
       "id": "ichon1",
       "name": "이촌1주차장",
       "note": "한강공원",
       "total": 32,
-      "available": 68,
+      "available": 7,
       "status": "ok",
       "ok": true,
-      "link": "https://map.naver.com/p/search/이촌1주차장"
+      "link": "https://ihangangpark.kr/parking/region/region6"
     },
     {
       "id": "ichon2",
       "name": "이촌2주차장",
       "note": "한강공원",
       "total": 93,
-      "available": 67,
-      "status": "ok",
+      "available": 1,
+      "status": "busy",
       "ok": true,
-      "link": "https://map.naver.com/p/search/이촌2주차장"
+      "link": "https://ihangangpark.kr/parking/region/region6"
     },
     {
       "id": "ichon3",
       "name": "이촌3주차장",
       "note": "한강공원",
       "total": 160,
-      "available": 190,
+      "available": 77,
       "status": "ok",
       "ok": true,
-      "link": "https://map.naver.com/p/search/이촌3주차장"
+      "link": "https://ihangangpark.kr/parking/region/region6"
     }
   ]
 }

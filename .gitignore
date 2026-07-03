@@ -9,6 +9,11 @@
 !/assets/gallery/.gitkeep
 !/assets/gallery/*.webp
 
+# 스토리 섹션 원본 사진 — 갤러리와 동일하게 WebP만 배포 (원본은 로컬 백업용)
+/assets/images/story/*
+!/assets/images/story/.gitkeep
+!/assets/images/story/*.webp
+
 # QR 코드 — 올리지 않음 (로컬에서 인쇄/공유용)
 /assets/images/qr.png
 
