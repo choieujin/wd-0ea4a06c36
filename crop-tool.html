@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>사진 위치 조정 도구</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Gowun Dodum", -apple-system, sans-serif;
+      background: #efe6d2; color: #2a2723;
+      padding: 24px 16px 60px; line-height: 1.7;
+    }
+    .wrap { max-width: 460px; margin: 0 auto; }
+    h1 { font-size: 1.2rem; margin-bottom: 6px; }
+    .desc { font-size: 0.9rem; color: #6b6457; margin-bottom: 20px; }
+    .desc b { color: #ff3d83; }
+
+    /* 실제 갤러리 월과 동일한 격자 */
+    .story-mosaic {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 10px;
+      grid-template-areas:
+        "q q .  d"
+        "q q c  d"
+        "a b c  d"
+        "a b e  e";
+    }
+    .quote {
+      grid-area: q; align-self: start; text-align: right; padding-right: 4px;
+      font-size: 1.1rem; line-height: 1.6; color: #2a2723;
+    }
+    .mframe {
+      position: relative; margin: 0; background: #fff;
+      border: 4px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.14);
+      overflow: hidden; cursor: grab; touch-action: none; user-select: none;
+    }
+    .mframe.dragging { cursor: grabbing; }
+    .mframe.dropok { outline: 3px dashed #ff3d83; outline-offset: -3px; }
+    .mframe img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      object-position: 50% 50%; transform-origin: 50% 50%;
+      pointer-events: none;
+    }
+    .mframe .tag {
+      position: absolute; left: 3px; top: 3px; z-index: 2;
+      background: rgba(255,61,131,0.9); color: #fff;
+      font-size: 0.62rem; padding: 1px 5px; border-radius: 8px;
+      pointer-events: none;
+    }
+    .mframe .pos {
+      position: absolute; right: 3px; bottom: 3px; z-index: 2;
+      background: rgba(0,0,0,0.55); color: #fff;
+      font-size: 0.58rem; padding: 1px 5px; border-radius: 8px;
+      pointer-events: none; font-variant-numeric: tabular-nums;
+    }
+    .zoom {
+      position: absolute; right: 3px; top: 3px; z-index: 3;
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .zoom button {
+      width: 22px; height: 22px; padding: 0; border-radius: 6px;
+      background: rgba(0,0,0,0.55); color: #fff; font-size: 1rem;
+      line-height: 1; font-weight: 700; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .mframe--1 { grid-area: a; }
+    .mframe--2 { grid-area: b; }
+    .mframe--3 { grid-area: c; }
+    .mframe--4 { grid-area: d; }
+    .mframe--5 { grid-area: e; }
+
+    .bar { display: flex; gap: 8px; margin: 22px 0 10px; flex-wrap: wrap; }
+    button {
+      font-family: inherit; font-size: 0.92rem; cursor: pointer;
+      border: none; border-radius: 10px; padding: 10px 16px;
+      background: #ff3d83; color: #fff; font-weight: 700;
+    }
+    button.ghost { background: #d8cdb4; color: #2a2723; }
+    button:active { transform: translateY(1px); }
+    textarea {
+      width: 100%; min-height: 160px; margin-top: 6px;
+      font-family: ui-monospace, Menlo, monospace; font-size: 0.8rem;
+      border: 1px solid #d8cdb4; border-radius: 10px; padding: 10px;
+      background: #fff; color: #2a2723; resize: vertical;
+    }
+    .hint { font-size: 0.82rem; color: #6b6457; margin-top: 8px; }
+    .copied { color: #ff3d83; font-weight: 700; }
+
+    /* 사진 보관함 */
+    .tray-title { font-size: 0.95rem; font-weight: 700; margin: 26px 0 4px; }
+    .tray-sub { font-size: 0.8rem; color: #6b6457; margin-bottom: 10px; }
+    .tray {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    }
+    .thumb {
+      position: relative; aspect-ratio: 3 / 4; border-radius: 8px;
+      overflow: hidden; cursor: grab; background: #fff;
+      border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+    .thumb.dragging { opacity: 0.5; }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+    .thumb span {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5); color: #fff; font-size: 0.55rem;
+      padding: 2px 3px; text-align: center; pointer-events: none;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>📷 사진 위치 조정 도구</h1>
+    <p class="desc">
+      아래 <b>사진 보관함</b>에서 사진을 프레임으로 <b>드래그&드롭</b>하면 교체됩니다.<br />
+      프레임 안에서 <b>드래그</b>로 위치, <b>＋/－</b>(또는 트랙패드 확대)로 <b>확대</b>하세요.<br />
+      다 맞추면 <b>[값 복사]</b> → 채팅에 붙여넣어 주세요.
+    </p>
+
+    <div class="story-mosaic" id="mosaic">
+      <p class="quote">서로의 시간이 만나<br />하나의 이야기가<br />되었습니다.</p>
+
+      <figure class="mframe mframe--1" data-file="tulip.webp">
+        <span class="tag">1</span>
+        <div class="zoom"><button data-z="in">＋</button><button data-z="out">－</button></div>
+        <img src="assets/images/story/tulip.webp" alt="" draggable="false" />
+        <span class="pos">50% 50% · 1.0×</span>
+      </figure>
+      <figure class="mframe mframe--2" data-file="junjo.webp">
+        <span class="tag">2</span>
+        <div class="zoom"><button data-z="in">＋</button><button data-z="out">－</button></div>
+        <img src="assets/images/story/junjo.webp" alt="" draggable="false" />
+        <span class="pos">50% 50% · 1.0×</span>
+      </figure>
+      <figure class="mframe mframe--3" data-file="sancheon.webp">
+        <span class="tag">3</span>
+        <div class="zoom"><button data-z="in">＋</button><button data-z="out">－</button></div>
+        <img src="assets/images/story/sancheon.webp" alt="" draggable="false" />
+        <span class="pos">50% 50% · 1.0×</span>
+      </figure>
+      <figure class="mframe mframe--4" data-file="IMG_3466.webp">
+        <span class="tag">4</span>
+        <div class="zoom"><button data-z="in">＋</button><button data-z="out">－</button></div>
+        <img src="assets/images/story/IMG_3466.webp" alt="" draggable="false" />
+        <span class="pos">50% 50% · 1.0×</span>
+      </figure>
+      <figure class="mframe mframe--5" data-file="IMG_4201.webp">
+        <span class="tag">5</span>
+        <div class="zoom"><button data-z="in">＋</button><button data-z="out">－</button></div>
+        <img src="assets/images/story/IMG_4201.webp" alt="" draggable="false" />
+        <span class="pos">50% 50% · 1.0×</span>
+      </figure>
+    </div>
+
+    <div class="bar">
+      <button id="copyBtn">값 복사</button>
+      <button class="ghost" id="resetBtn">위치·확대 초기화</button>
+    </div>
+    <textarea id="out" readonly></textarea>
+    <p class="hint" id="hint">사진 교체·위치·확대를 맞춘 뒤 [값 복사]를 누르세요.</p>
+
+    <div class="tray-title">🗂 사진 보관함</div>
+    <p class="tray-sub" id="traySub">폴더의 사진을 불러오는 중…</p>
+    <div class="tray" id="tray"></div>
+  </div>
+
+  <script>
+    const MINZ = 1, MAXZ = 4;
+    const STORY = 'assets/images/story/';
+    const frames = [...document.querySelectorAll('.mframe')];
+    const state = new Map(); // el -> {x, y, z}
+
+    function applyFrame(f) {
+      const s = state.get(f);
+      const img = f.querySelector('img');
+      img.style.objectPosition = `${s.x}% ${s.y}%`;
+      img.style.transformOrigin = `${s.x}% ${s.y}%`;
+      img.style.transform = `scale(${s.z})`;
+      f.querySelector('.pos').textContent =
+        `${Math.round(s.x)}% ${Math.round(s.y)}% · ${s.z.toFixed(1)}×`;
+    }
+    function resetFrame(f) {
+      state.set(f, { x: 50, y: 50, z: 1 });
+      applyFrame(f);
+    }
+
+    frames.forEach(f => {
+      state.set(f, { x: 50, y: 50, z: 1 });
+
+      // 드래그로 이동
+      let dragging = false, lastX = 0, lastY = 0;
+      f.addEventListener('pointerdown', e => {
+        if (e.target.closest('.zoom')) return;
+        dragging = true; lastX = e.clientX; lastY = e.clientY;
+        f.classList.add('dragging'); f.setPointerCapture(e.pointerId);
+      });
+      f.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        const rect = f.getBoundingClientRect();
+        const dx = e.clientX - lastX, dy = e.clientY - lastY;
+        lastX = e.clientX; lastY = e.clientY;
+        const s = state.get(f);
+        s.x = Math.min(100, Math.max(0, s.x - dx / rect.width * 100));
+        s.y = Math.min(100, Math.max(0, s.y - dy / rect.height * 100));
+        applyFrame(f);
+      });
+      const stop = () => { dragging = false; f.classList.remove('dragging'); };
+      f.addEventListener('pointerup', stop);
+      f.addEventListener('pointercancel', stop);
+
+      // 트랙패드 확대/스크롤로 줌
+      f.addEventListener('wheel', e => {
+        e.preventDefault();
+        const s = state.get(f);
+        s.z = Math.min(MAXZ, Math.max(MINZ, s.z - e.deltaY * 0.003));
+        applyFrame(f);
+      }, { passive: false });
+
+      // ＋ / － 버튼
+      f.querySelectorAll('.zoom button').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const s = state.get(f);
+          s.z = Math.min(MAXZ, Math.max(MINZ, s.z + (btn.dataset.z === 'in' ? 0.25 : -0.25)));
+          applyFrame(f);
+        });
+      });
+
+      // 보관함에서 드롭 -> 사진 교체
+      f.addEventListener('dragover', e => { e.preventDefault(); f.classList.add('dropok'); });
+      f.addEventListener('dragleave', () => f.classList.remove('dropok'));
+      f.addEventListener('drop', e => {
+        e.preventDefault();
+        f.classList.remove('dropok');
+        const file = e.dataTransfer.getData('text/plain');
+        if (!file) return;
+        f.querySelector('img').src = STORY + file;
+        f.dataset.file = file;
+        resetFrame(f);
+      });
+
+      applyFrame(f);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      frames.forEach(resetFrame);
+      document.getElementById('out').value = '';
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const lines = frames.map(f => {
+        const s = state.get(f);
+        const cls = [...f.classList].find(c => c.startsWith('mframe--'));
+        return `${cls} | ${f.dataset.file} | object-position: ${Math.round(s.x)}% ${Math.round(s.y)}% | scale: ${s.z.toFixed(2)}`;
+      });
+      const text = 'PHOTO POSITIONS\n' + lines.join('\n');
+      document.getElementById('out').value = text;
+      try {
+        await navigator.clipboard.writeText(text);
+        document.getElementById('hint').innerHTML =
+          '<span class="copied">복사됐어요!</span> 이 내용을 채팅에 붙여넣어 주세요.';
+      } catch (err) {
+        document.getElementById('hint').textContent =
+          '아래 칸의 내용을 전체 선택해 복사한 뒤 채팅에 붙여넣어 주세요.';
+      }
+    });
+
+    // ===== 사진 보관함: 폴더 자동 스캔 =====
+    async function listPhotos() {
+      try {
+        const res = await fetch(STORY);
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const files = [...doc.querySelectorAll('a')]
+          .map(a => a.getAttribute('href'))
+          .filter(h => h && /\.(webp|jpe?g|png)$/i.test(h))
+          .map(h => decodeURIComponent(h.split('/').pop()));
+        // 같은 이름의 jpg/webp 는 webp 우선으로 하나만
+        const map = new Map();
+        files.forEach(f => {
+          const base = f.replace(/\.[^.]+$/, '');
+          const ext = f.split('.').pop().toLowerCase();
+          if (!map.has(base) || ext === 'webp') map.set(base, f);
+        });
+        return [...map.values()].sort();
+      } catch (e) { return null; }
+    }
+
+    (async () => {
+      const tray = document.getElementById('tray');
+      const sub = document.getElementById('traySub');
+      const files = await listPhotos();
+      if (!files) {
+        sub.textContent = '폴더 목록을 불러오지 못했어요. (python http.server 로 실행 중인지 확인해 주세요)';
+        return;
+      }
+      sub.textContent = `사진 ${files.length}장 — 원하는 사진을 위 프레임으로 끌어다 놓으세요.`;
+      files.forEach(file => {
+        const t = document.createElement('div');
+        t.className = 'thumb';
+        t.draggable = true;
+        t.innerHTML = `<img src="${STORY}${file}" alt="" draggable="false" /><span>${file}</span>`;
+        t.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text/plain', file);
+          e.dataTransfer.effectAllowed = 'copy';
+          t.classList.add('dragging');
+        });
+        t.addEventListener('dragend', () => t.classList.remove('dragging'));
+        tray.appendChild(t);
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -15,9 +15,9 @@
   --black: #141210;
 
   --maxw: 460px;
-  --hand: "Gaegu", "Nanum Pen Script", cursive;
-  --pen: "Nanum Pen Script", "Gaegu", cursive;
-  --script: "Pinyon Script", "Parisienne", cursive;
+  --hand: "Gowun Dodum", sans-serif;
+  --pen: "Gowun Dodum", sans-serif;
+  --script: "Cormorant Garamond", "Gowun Dodum", sans-serif;
   --sans: "Noto Sans KR", sans-serif;
 
   /* 종이 그레인 (재사용) */
@@ -252,7 +252,7 @@ section.paper + section.paper::after {
 }
 .greeting__text {
   font-family: var(--pen);
-  font-size: 1.45rem;
+  font-size: 1.12rem;
   color: var(--ink);
   line-height: 1.75;
   letter-spacing: 0.01em;
@@ -262,7 +262,7 @@ section.paper + section.paper::after {
   margin-top: 34px;
   font-family: var(--hand);
   color: var(--ink-soft);
-  font-size: 1.2rem;
+  font-size: 1.0rem;
 }
 .greeting__family p { margin: 4px 0; }
 .greeting__family strong { color: var(--pink); font-weight: 700; }
@@ -308,10 +308,10 @@ section.paper + section.paper::after {
 .sketchbook-page .story__quote,
 .sketchbook-page .greeting__text,
 .sketchbook-page .notice__text { color: #f7f4ec; }
-.sketchbook-page .story__quote { font-size: 1.34rem; }
-.sketchbook-page .greeting__text { font-size: 1.24rem; line-height: 1.72; }
+.sketchbook-page .story__quote { font-size: 1.08rem; }
+.sketchbook-page .greeting__text { font-size: 1.02rem; line-height: 1.72; }
 .sketchbook-page .greeting__text span { color: #ffd6e3; }
-.sketchbook-page .notice__text { font-size: 1.2rem; line-height: 1.65; }
+.sketchbook-page .notice__text { font-size: 1.0rem; line-height: 1.65; }
 .sketchbook-page .notice__text + .notice__text { border-top-color: rgba(255,255,255,0.32); }
 
 /* 사진은 종이에 붙인 듯한 느낌 (흰 테두리 + 마스킹 테이프) */
@@ -335,11 +335,63 @@ section.paper + section.paper::after {
 .story > * { position: relative; z-index: 2; }
 .story__quote {
   font-family: var(--hand);
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   color: var(--ink);
   line-height: 1.7;
   margin-bottom: 30px;
 }
+/* ===== Story gallery wall (좌상단 글씨 · 격자 정렬 액자) ===== */
+.story-mosaic {
+  margin-top: 64px;              /* 문구 이전 빈 공간 */
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 10px;
+  grid-template-areas:
+    "q q .  d"
+    "q q c  d"
+    "a b c  d"
+    "a b e  e";
+}
+.story-mosaic__quote {
+  grid-area: q;
+  align-self: start;
+  margin: 0;
+  font-family: var(--hand);
+  font-size: 1.24rem;
+  line-height: 1.62;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  text-align: right;
+  padding-right: 4px;
+}
+.mframe {
+  position: relative;
+  margin: 0;
+  background: #fff;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.14);
+  overflow: hidden;
+}
+.mframe img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mframe__ph {
+  position: absolute; inset: 0; z-index: -1;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--hand); font-size: 0.82rem; color: var(--ink-soft);
+  opacity: 0.55;
+}
+.mframe.is-empty { background: #f4f1ea; }
+.mframe.is-empty .mframe__ph { z-index: 1; }
+
+/* 갤러리 월: 크기가 다른 액자가 격자에 정렬 */
+.mframe--1 { grid-area: a; }
+.mframe--2 { grid-area: b; }
+.mframe--3 { grid-area: c; }
+.mframe--4 { grid-area: d; }
+.mframe--5 { grid-area: e; }
+
 .polaroid {
   display: inline-block;
   background: #fff;
@@ -352,20 +404,20 @@ section.paper + section.paper::after {
 .polaroid__cap {
   font-family: var(--hand);
   color: var(--ink-soft);
-  font-size: 1.15rem;
+  font-size: 1.0rem;
   margin-top: 12px;
 }
 
 /* ===== Childhood (가족사진 + 아기 컷아웃 콜라주) ===== */
 .child-intro {
-  font-family: var(--hand); font-size: 1.3rem; color: var(--ink-soft);
+  font-family: var(--hand); font-size: 1.08rem; color: var(--ink-soft);
   line-height: 1.6; margin: -8px 0 38px;
 }
 .child-group + .child-group { margin-top: 60px; }
 .child-group__who {
-  font-family: var(--hand); font-size: 1.3rem; color: var(--ink); margin-bottom: 16px;
+  font-family: var(--hand); font-size: 1.08rem; color: var(--ink); margin-bottom: 16px;
 }
-.child-group__who strong { color: var(--pink); font-weight: 700; font-size: 1.5rem; }
+.child-group__who strong { color: var(--pink); font-weight: 700; font-size: 1.22rem; }
 
 .collage { position: relative; width: 100%; max-width: 360px; margin: 0 auto; min-height: 300px; }
 
@@ -445,7 +497,7 @@ section.paper + section.paper::after {
 .col-heart--3 { width: 34px; height: 34px; bottom: 0; left: 40%; transform: rotate(-8deg); }
 
 /* ===== Calendar ===== */
-.calendar__headline { font-family: var(--hand); font-size: 1.5rem; line-height: 1.5; margin-bottom: 26px; color: var(--ink); }
+.calendar__headline { font-family: var(--hand); font-size: 1.2rem; line-height: 1.5; margin-bottom: 26px; color: var(--ink); }
 .calendar__grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -474,10 +526,10 @@ section.paper + section.paper::after {
   transform: translate(-50%, -46%);
   z-index: -1;
 }
-.calendar__dday { margin-top: 26px; font-family: var(--hand); color: var(--pink); font-size: 1.15rem; }
+.calendar__dday { margin-top: 26px; font-family: var(--hand); color: var(--pink); font-size: 1.0rem; }
 
 /* ===== Location ===== */
-.location__name { font-family: var(--hand); font-size: 1.6rem; font-weight: 700; color: var(--ink); }
+.location__name { font-family: var(--hand); font-size: 1.28rem; font-weight: 700; color: var(--ink); }
 .location__addr { color: var(--ink-soft); font-size: 0.92rem; margin-top: 4px; }
 .location__maps { display: flex; gap: 8px; justify-content: center; margin: 24px 0 8px; flex-wrap: wrap; }
 .map-btn {
@@ -495,7 +547,7 @@ section.paper + section.paper::after {
 
 .info-block { margin-top: 22px; padding-top: 20px; border-top: 1px dashed var(--line); }
 .info-block:first-of-type { margin-top: 26px; }
-.info-block h3 { font-family: var(--hand); font-size: 1.25rem; color: var(--pink); margin-bottom: 6px; }
+.info-block h3 { font-family: var(--hand); font-size: 1.05rem; color: var(--pink); margin-bottom: 6px; }
 .info-block p { font-size: 0.92rem; color: var(--ink); line-height: 1.7; }
 .info-block p + p { margin-top: 4px; }
 .info-block strong { color: var(--pink); font-weight: 700; }
@@ -507,13 +559,6 @@ section.paper + section.paper::after {
 }
 .park-notice { padding: 26px 24px 24px; }
 .park-live { margin-top: 22px; padding: 26px 22px 22px; }
-/* 잡지에서 뜯어 붙인 듯한 찢긴 종이 가장자리 */
-.park-notice::before, .park-live::before {
-  content: ""; position: absolute; inset: 3px;
-  background: #fdf8ee; border: 2px solid #a7a094;
-  filter: url(#torn-edge) drop-shadow(2px 4px 0 rgba(20,18,16,0.1));
-  z-index: 0;
-}
 .park-notice > *, .park-live > * { position: relative; z-index: 1; }
 /* 찢긴 핑크 테이프 라벨 — 흰 볼드 글씨 (그런지 포스터 느낌) */
 .park-notice__title, .park-live__title {
@@ -576,12 +621,25 @@ section.paper + section.paper::after {
 .park-card__nums { display: block; margin-top: 5px; font-size: 0.88rem; color: var(--ink-soft); }
 .park-card__nums strong { color: var(--black); font-size: 1.05rem; font-weight: 800; }
 .park-card__nums--muted { color: var(--ink-soft); font-size: 0.82rem; }
-.park-card__link {
+.park-card__link, .park-card__go {
   flex: none; font-size: 0.75rem; font-weight: 800; color: var(--pink);
   text-decoration: none; white-space: nowrap;
   border-bottom: 2px solid var(--pink-soft); padding-bottom: 1px;
 }
 .park-card__note { display: block; margin-top: 2px; font-size: 0.76rem; color: var(--ink-soft); }
+
+/* 클릭 가능한 주차 카드 (전체가 링크) */
+.park-card__hit { display: block; color: inherit; text-decoration: none; }
+.park-card.is-clickable { position: relative; cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease; }
+.park-card.is-clickable:hover { box-shadow: 3px 3px 0 rgba(255,61,131,0.18); }
+.park-card.is-clickable:active { transform: translateY(1px); box-shadow: 1px 1px 0 rgba(20,18,16,0.1); }
+/* 상태 카드(숫자형)에는 우측 하단에 이동 표시 */
+.park-card.is-clickable:not(.is-link) .park-card__hit { padding-right: 16px; }
+.park-card.is-clickable:not(.is-link)::after {
+  content: "›"; position: absolute; right: 12px; bottom: 8px;
+  font-size: 1.1rem; line-height: 1; font-weight: 800; color: var(--pink);
+}
 .park-live__foot {
   text-align: center; font-size: 0.74rem; color: var(--ink-soft); margin-top: 14px;
 }
@@ -618,7 +676,7 @@ section.paper + section.paper::after {
 .acc-copy:active { background: var(--ink); }
 
 /* ===== Notice ===== */
-.notice__text { font-family: var(--pen); color: var(--ink); font-size: 1.4rem; line-height: 1.6; }
+.notice__text { font-family: var(--pen); color: var(--ink); font-size: 1.1rem; line-height: 1.6; }
 .notice__text + .notice__text { margin-top: 22px; padding-top: 22px; border-top: 1px dashed var(--line); }
 
 /* ===== Gallery (테이프 폴라로이드) ===== */
@@ -648,7 +706,7 @@ section.paper + section.paper::after {
   background: var(--pink);
   clip-path: polygon(50% 100%, 10% 60%, 0% 36%, 9% 16%, 31% 11%, 50% 27%, 69% 11%, 91% 16%, 100% 36%, 90% 60%);
 }
-.footer__names { font-family: var(--hand); font-size: 1.4rem; letter-spacing: 0.06em; }
+.footer__names { font-family: var(--hand); font-size: 1.15rem; letter-spacing: 0.06em; }
 .footer__date { margin-top: 6px; font-size: 0.85rem; opacity: 0.85; }
 
 /* ===== Heart Locket (은색 하트 로켓) ===== */
