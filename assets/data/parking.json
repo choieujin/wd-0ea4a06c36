@@ -1,17 +1,19 @@
 {
-  "updatedAt": "2026-07-03T16:03:02.016+09:00",
-  "elapsedMs": 138,
-  "errors": [],
+  "updatedAt": "2026-07-03T16:23:54.025+09:00",
+  "elapsedMs": 58458,
+  "errors": [
+    "삼각지: 파싱 실패"
+  ],
   "lots": [
     {
       "id": "samgakji",
       "name": "삼각지역 임시주차장",
       "note": "전쟁기념관·대절버스 인근",
-      "status": "link",
       "link": "https://www.yong-san.or.kr/site/main/parking/infos",
       "linkLabel": "현장 실시간 확인 →",
       "total": null,
       "available": null,
+      "status": "link",
       "ok": false
     },
     {
@@ -39,7 +41,7 @@
       "name": "이촌2주차장",
       "note": "한강공원",
       "total": 93,
-      "available": 1,
+      "available": 7,
       "status": "busy",
       "ok": true,
       "link": "https://ihangangpark.kr/parking/region/region6"
@@ -49,7 +51,7 @@
       "name": "이촌3주차장",
       "note": "한강공원",
       "total": 160,
-      "available": 77,
+      "available": 108,
       "status": "ok",
       "ok": true,
       "link": "https://ihangangpark.kr/parking/region/region6"
