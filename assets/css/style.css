@@ -91,8 +91,15 @@ section.paper + section.paper::after {
 /* ===== Reveal ===== */
 .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.9s ease, transform 0.9s ease; }
 .reveal.is-visible { opacity: 1; transform: none; }
+
+/* 표지는 첫 화면이므로 JS(IntersectionObserver) 실행을 기다리지 않고
+   CSS 로드 애니메이션으로 즉시 페이드인 → 초기 화면 지연 방지 */
+.cover.reveal { animation: coverIn 0.9s ease both; }
+@keyframes coverIn { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
+  .cover.reveal { animation: none; opacity: 1; transform: none; }
 }
 
 /* ===== 핑크 듀오톤 + 하프톤 ===== */
