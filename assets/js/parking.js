@@ -1,11 +1,14 @@
-// 실시간 주차 현황 위젯 — assets/data/parking.json 을 읽어 렌더링.
-// 데이터는 GitHub Actions(scripts/fetch-parking.mjs)가 주기적으로 갱신한다.
+// 실시간 주차 현황 위젯 — parking.json 을 읽어 렌더링.
+// 데이터는 GitHub Actions(scripts/fetch-parking.mjs)가 주기적으로 갱신·커밋한다.
+// data-remote(raw.githubusercontent) 를 먼저 읽어, 사이트 재배포 없이 최신 데이터를 반영한다.
+// (raw 실패 시 배포본 data-src 로 폴백)
 (function () {
   "use strict";
   var root = document.getElementById("parkLive");
   if (!root) return;
 
   var SRC = root.getAttribute("data-src") || "assets/data/parking.json";
+  var REMOTE = root.getAttribute("data-remote") || "";
   var listEl = document.getElementById("parkList");
   var updEl = document.getElementById("parkUpdated");
 
@@ -81,11 +84,21 @@
     updEl.textContent = "";
   }
 
+  function fetchJson(url) {
+    var u = url + (url.indexOf("?") < 0 ? "?" : "&") + "t=" + Date.now();
+    return fetch(u, { cache: "no-store" }).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    });
+  }
+
+  // raw(원본) 우선 → 실패 시 배포본으로 폴백
   function load() {
-    fetch(SRC + "?t=" + Date.now(), { cache: "no-store" })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(render)
-      .catch(fail);
+    var primary = REMOTE || SRC;
+    fetchJson(primary).then(render).catch(function () {
+      if (primary !== SRC) fetchJson(SRC).then(render).catch(fail);
+      else fail();
+    });
   }
 
   load();
