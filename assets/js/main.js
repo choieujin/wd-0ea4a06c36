@@ -114,6 +114,25 @@
         if (!single && e.key === "ArrowLeft") show(cur - 1);
         if (!single && e.key === "ArrowRight") show(cur + 1);
       });
+      // 좌우 스와이프로 이전/다음 사진 넘기기
+      var touchX = 0, touchY = 0, swiping = false;
+      lb.addEventListener("touchstart", function (e) {
+        if (single || e.touches.length !== 1) { swiping = false; return; }
+        touchX = e.touches[0].clientX;
+        touchY = e.touches[0].clientY;
+        swiping = true;
+      }, { passive: true });
+      lb.addEventListener("touchend", function (e) {
+        if (!swiping) return;
+        swiping = false;
+        var t = e.changedTouches[0];
+        var dx = t.clientX - touchX;
+        var dy = t.clientY - touchY;
+        // 가로 이동이 충분하고 세로보다 클 때만 스와이프로 인식
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+          show(dx < 0 ? cur + 1 : cur - 1);
+        }
+      }, { passive: true });
       ready = true;
     }
     return {
