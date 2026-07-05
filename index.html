@@ -263,19 +263,58 @@
       <div class="park-notice">
         <p class="park-notice__title">주차 안내</p>
         <div class="park-notice__lines">
-          <p class="park-notice__line">예식장 주변 주차장이 혼잡합니다.</p>
-          <p class="park-notice__line"><strong>대중교통</strong> 이용을 권장드리며,</p>
-          <p class="park-notice__line"><strong>용산 전쟁기념관</strong> 주차 후 대절버스,</p>
-          <p class="park-notice__line">또는 <strong>인근 여유 주차장</strong>을</p>
-          <p class="park-notice__line">이용해 주세요.</p>
+          <p class="park-notice__line">예식장 주변은 주차가 혼잡합니다.</p>
+          <p class="park-notice__line">가급적 <strong>대중교통</strong> 이용을 권장드립니다.</p>
+          <p class="park-notice__line">차량 이용 시 <strong>용산 전쟁기념관</strong>에 주차 후</p>
+          <p class="park-notice__line">대절버스로 이동해 주시기 바랍니다.</p>
         </div>
       </div>
 
+      <!-- ===== 실시간 주차 현황(자동 수집) — 원복 가능성 있어 주석 처리 =====
+           복원하려면 아래 블록 주석 해제 + parking.js 스크립트 태그 주석 해제
+           + .github/workflows/parking.yml 의 schedule 크론 주석 해제.
       <div class="park-live" id="parkLive" data-src="assets/data/parking.json" data-remote="https://raw.githubusercontent.com/choieujin/wd-0ea4a06c36/main/assets/data/parking.json">
         <h3 class="park-live__title">실시간 주차 현황</h3>
         <p class="park-live__updated" id="parkUpdated">불러오는 중…</p>
         <ul class="park-live__list" id="parkList"></ul>
         <p class="park-live__foot">결혼식 당일 10분 간격으로 업데이트될 예정입니다.</p>
+      </div>
+      ===== /실시간 주차 현황 ===== -->
+
+      <!-- ===== 근처 공영주차장(정적 안내) ===== -->
+      <div class="park-live">
+        <h3 class="park-live__title">근처 공영주차장</h3>
+        <p class="park-live__updated">전쟁기념관 주차 후 대절버스 이용을 권장드리며,<br />혹시 모를 상황을 대비해 인근 공영주차장도 함께 안내드립니다.</p>
+        <ul class="park-live__list">
+          <li class="park-card is-clickable is-link">
+            <a class="park-card__hit" href="https://parking.seoul.go.kr/#" target="_blank" rel="noopener">
+              <div class="park-card__head">
+                <span class="park-card__name">동작대교 공영주차장</span>
+                <span class="park-card__link">현황 보기</span>
+              </div>
+              <span class="park-card__note">서울시 시영 · 실시간 현황</span>
+            </a>
+          </li>
+          <li class="park-card is-clickable is-link">
+            <a class="park-card__hit" href="https://www.ihangangpark.kr/parking/region/region6" target="_blank" rel="noopener">
+              <div class="park-card__head">
+                <span class="park-card__name">이촌 1·2·3·4 주차장</span>
+                <span class="park-card__link">현황 보기</span>
+              </div>
+              <span class="park-card__note">한강공원(이촌) · 실시간 현황</span>
+            </a>
+          </li>
+          <li class="park-card is-clickable is-link">
+            <a class="park-card__hit" href="https://www.yong-san.or.kr/site/main/parking/infos" target="_blank" rel="noopener">
+              <div class="park-card__head">
+                <span class="park-card__name">삼각지역 임시주차장</span>
+                <span class="park-card__link">현황 보기</span>
+              </div>
+              <span class="park-card__note">용산구 운영 · 전쟁기념관 인근</span>
+            </a>
+          </li>
+        </ul>
+        <p class="park-live__foot">실시간 잔여 자리는 각 링크에서 확인하실 수 있습니다.</p>
       </div>
     </section>
 
@@ -344,7 +383,9 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script defer src="assets/js/gallery-list.js?v=11"></script>
+  <!-- 실시간 주차 위젯 비활성화(원복 가능). 복원 시 주석 해제.
   <script defer src="assets/js/parking.js?v=19"></script>
+  -->
   <script defer src="assets/js/decor.js?v=11"></script>
   <script defer src="assets/js/main.js?v=11"></script>
 </body>
