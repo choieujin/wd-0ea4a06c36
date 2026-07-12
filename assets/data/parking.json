@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-07-12T18:21:19.399+09:00",
-  "elapsedMs": 2202,
+  "updatedAt": "2026-07-12T19:48:43.272+09:00",
+  "elapsedMs": 1900,
   "errors": [],
   "lots": [
     {
@@ -19,7 +19,7 @@
       "name": "이촌1주차장",
       "note": "한강공원",
       "total": 32,
-      "available": 33,
+      "available": 44,
       "status": "ok",
       "ok": true,
       "link": "https://ihangangpark.kr/parking/region/region6"
@@ -29,7 +29,7 @@
       "name": "이촌2주차장",
       "note": "한강공원",
       "total": 93,
-      "available": 17,
+      "available": 24,
       "status": "ok",
       "ok": true,
       "link": "https://ihangangpark.kr/parking/region/region6"
@@ -39,7 +39,7 @@
       "name": "이촌3주차장",
       "note": "한강공원",
       "total": 160,
-      "available": 121,
+      "available": 106,
       "status": "ok",
       "ok": true,
       "link": "https://ihangangpark.kr/parking/region/region6"
