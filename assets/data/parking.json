@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-07-14T10:05:35.267+09:00",
-  "elapsedMs": 2716,
+  "updatedAt": "2026-07-14T13:13:54.286+09:00",
+  "elapsedMs": 3049,
   "errors": [],
   "lots": [
     {
@@ -39,7 +39,7 @@
       "name": "이촌3주차장",
       "note": "한강공원",
       "total": 160,
-      "available": 149,
+      "available": 155,
       "status": "ok",
       "ok": true,
       "link": "https://ihangangpark.kr/parking/region/region6"
