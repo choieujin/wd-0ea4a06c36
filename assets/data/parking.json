@@ -1,7 +1,9 @@
 {
-  "updatedAt": "2026-07-14T15:29:38.050+09:00",
-  "elapsedMs": 2726,
-  "errors": [],
+  "updatedAt": "2026-07-14T17:40:06.352+09:00",
+  "elapsedMs": 20372,
+  "errors": [
+    "이촌: timeout"
+  ],
   "lots": [
     {
       "id": "samgakji",
@@ -18,30 +20,30 @@
       "id": "ichon1",
       "name": "이촌1주차장",
       "note": "한강공원",
-      "total": 32,
-      "available": 6,
-      "status": "ok",
-      "ok": true,
+      "total": null,
+      "available": null,
+      "status": "error",
+      "ok": false,
       "link": "https://ihangangpark.kr/parking/region/region6"
     },
     {
       "id": "ichon2",
       "name": "이촌2주차장",
       "note": "한강공원",
-      "total": 93,
-      "available": 0,
-      "status": "full",
-      "ok": true,
+      "total": null,
+      "available": null,
+      "status": "error",
+      "ok": false,
       "link": "https://ihangangpark.kr/parking/region/region6"
     },
     {
       "id": "ichon3",
       "name": "이촌3주차장",
       "note": "한강공원",
-      "total": 160,
-      "available": 120,
-      "status": "ok",
-      "ok": true,
+      "total": null,
+      "available": null,
+      "status": "error",
+      "ok": false,
       "link": "https://ihangangpark.kr/parking/region/region6"
     }
   ]
