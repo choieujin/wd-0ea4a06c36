@@ -41,6 +41,10 @@
     .gitem .mv:disabled { opacity:.25; }
     .gitem.dragging { opacity:.35; }
     .gitem.dragover { outline:2px dashed var(--rose); outline-offset:2px; border-radius:8px; }
+    .advlb { position:fixed; inset:0; background:rgba(0,0,0,.92); display:flex; align-items:center; justify-content:center; z-index:100; }
+    .advlb img { max-width:94vw; max-height:88vh; object-fit:contain; border-radius:6px; }
+    .advlb .x { position:absolute; top:16px; right:18px; background:none; border:none; color:#fff; font-size:2.2rem; line-height:1; padding:0; }
+    .advlb .cap { position:absolute; bottom:20px; left:0; right:0; text-align:center; color:#fff; font-size:.8rem; opacity:.85; word-break:break-all; padding:0 16px; }
     .badge { font-size:.68rem; background:#f0eadd; color:var(--soft); padding:2px 7px; border-radius:20px; }
     .badge.warn { background:#fdeede; color:#b5651d; }
     #log { position:fixed; left:0; right:0; bottom:0; background:var(--ink); color:#fff; padding:10px 16px; font-size:.82rem; transform:translateY(120%); transition:transform .25s; z-index:50; }
@@ -114,6 +118,12 @@
       <div class="ggrid" id="galGrid"></div>
     </div>
   </div>
+</div>
+
+<div id="advLb" class="advlb hide">
+  <button class="x" id="advLbClose" aria-label="닫기">&times;</button>
+  <img id="advLbImg" src="" alt="" />
+  <div class="cap" id="advLbCap"></div>
 </div>
 
 <div id="log"></div>
@@ -365,6 +375,7 @@ function renderGallery(){
         <button class="mv" data-d="-1" title="앞으로" ${i===0?"disabled":""}>‹</button>
         <button class="mv" data-d="1" title="뒤로" ${i===galList.length-1?"disabled":""}>›</button>
       </div>`;
+    d.querySelector("img").addEventListener("click", ()=> openAdvLb("assets/gallery/"+encodeURIComponent(name), name));
     d.querySelector(".del").onclick=e=>{ e.stopPropagation(); removeGallery(name); };
     d.querySelectorAll(".mv").forEach(b=> b.onclick=e=>{ e.stopPropagation(); moveItem(i, +b.dataset.d); });
     d.addEventListener("dragstart",()=>{ dragFrom=i; d.classList.add("dragging"); });
@@ -425,7 +436,17 @@ function uniqueName(orig){
   return name;
 }
 
+// ---------- 사진 확대보기 ----------
+function openAdvLb(src, cap){
+  $("#advLbImg").src=src; $("#advLbCap").textContent=cap||"";
+  $("#advLb").classList.remove("hide");
+}
+function closeAdvLb(){ $("#advLb").classList.add("hide"); $("#advLbImg").src=""; }
+
 // ---------- 이벤트 ----------
+$("#advLbClose").onclick=closeAdvLb;
+$("#advLb").onclick=e=>{ if(e.target===$("#advLb")) closeAdvLb(); };
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeAdvLb(); });
 $("#connectBtn").onclick=connect;
 $("#locSave").onclick=saveLocation;
 $("#locReload").onclick=loadLocation;
