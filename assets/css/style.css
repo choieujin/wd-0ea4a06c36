@@ -350,7 +350,7 @@ section.paper + section.paper::after {
 }
 /* ===== Story gallery wall (좌상단 글씨 · 격자 정렬 액자) ===== */
 .story-mosaic {
-  margin-top: 128px;              /* 문구 이전 빈 공간 */
+  margin-top: 220px;              /* 문구 이전 빈 공간 */
   width: 100%;
   aspect-ratio: 1 / 1;
   display: grid;
@@ -422,7 +422,7 @@ section.paper + section.paper::after {
   font-family: var(--hand); font-size: 1.08rem; color: var(--ink-soft);
   line-height: 1.6; margin: -8px 0 38px;
 }
-.child-group + .child-group { margin-top: 60px; }
+.child-group + .child-group { margin-top: 120px; }
 .child-group__who {
   font-family: var(--hand); font-size: 1.08rem; color: var(--ink); margin-bottom: 16px;
 }
