@@ -6,10 +6,10 @@
   --ink: #2a2723;
   --ink-soft: #6b6457;
   --line: #d8cdb4;
-  --pink: #ff3d83;
+  --pink: #e15a86;
   --orage:#ffaa33;
   --navy: #403F6F;
-  --pink-soft: #ff7eae;
+  --pink-soft: #f0a4bb;
   --sky: #bcdcff;
   --sky-ink: #2f5f9c;
   --black: #141210;
@@ -159,7 +159,8 @@ section.paper + section.paper::after {
   aspect-ratio: 1 / 0.96;
   margin: 0 auto;
   background: var(--pink);
-  clip-path: polygon(50% 100%, 10% 60%, 0% 36%, 9% 16%, 31% 11%, 50% 27%, 69% 11%, 91% 16%, 100% 36%, 90% 60%);
+  /* 좌우 비대칭 하트 — 왼쪽 봉우리는 더 크고 둥글게, 오른쪽은 살짝 작고 각지게 */
+  clip-path: polygon(51% 100%, 7% 60%, 0% 33%, 8% 13%, 29% 8%, 50% 26%, 69% 13%, 91% 19%, 98% 40%, 89% 61%);
   filter: drop-shadow(0 8px 14px rgba(0,0,0,0.28));
   display: flex; align-items: center; justify-content: center;
 }
@@ -230,7 +231,7 @@ section.paper + section.paper::after {
   box-shadow: 0 10px 26px rgba(0,0,0,0.45);
 }
 
-.cover__heart { margin-top: 6px; }
+.cover__heart { margin-top: -70px; position: relative; z-index: 3; }
 .cover__names {
   font-family: var(--sans);
   font-weight: 500;
@@ -371,15 +372,16 @@ section.paper + section.paper::after {
   line-height: 1.62;
   color: var(--ink);
   letter-spacing: -0.01em;
-  text-align: right;
-  padding-right: 4px;
+  text-align: left;
+  padding-left: 2px;
 }
 .mframe {
   position: relative;
   margin: 0;
-  background: #fff;
-  border: 4px solid #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.14);
+  background: transparent;
+  border: none;
+  border-radius: 2px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
   overflow: hidden;
 }
 .mframe img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -639,7 +641,7 @@ section.paper + section.paper::after {
 .park-card__hit { display: block; color: inherit; text-decoration: none; }
 .park-card.is-clickable { position: relative; cursor: pointer;
   transition: transform 0.12s ease, box-shadow 0.12s ease; }
-.park-card.is-clickable:hover { box-shadow: 3px 3px 0 rgba(255,61,131,0.18); }
+.park-card.is-clickable:hover { box-shadow: 3px 3px 0 rgba(225,90,134,0.18); }
 .park-card.is-clickable:active { transform: translateY(1px); box-shadow: 1px 1px 0 rgba(20,18,16,0.1); }
 /* 상태 카드(숫자형)에는 우측 하단에 이동 표시 */
 .park-card.is-clickable:not(.is-link) .park-card__hit { padding-right: 16px; }
