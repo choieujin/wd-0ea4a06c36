@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>청첩장 관리자</title>
+  <style>
+    :root { --rose:#e15a86; --ink:#2a2723; --soft:#6b6457; --line:#e3ddd0; --bg:#f6efdf; --card:#fff; --ok:#2e9e6b; --err:#d1495b; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
+    .wrap { max-width:640px; margin:0 auto; padding:20px 16px 80px; }
+    h1 { font-size:1.4rem; margin-bottom:4px; }
+    .sub { color:var(--soft); font-size:.85rem; margin-bottom:18px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:14px; }
+    .card > h2 { font-size:1.05rem; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+    label { display:block; font-size:.82rem; color:var(--soft); margin:10px 0 4px; }
+    input[type=text], input[type=password], textarea, select {
+      width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; font:inherit; background:#fdfcf8; color:var(--ink);
+    }
+    textarea { min-height:70px; resize:vertical; font-family:ui-monospace,Menlo,monospace; font-size:.85rem; }
+    button { font:inherit; cursor:pointer; border:none; border-radius:8px; padding:9px 16px; background:var(--rose); color:#fff; font-weight:600; }
+    button.ghost { background:#f0eadd; color:var(--ink); }
+    button.mini { padding:6px 12px; font-size:.82rem; }
+    button:disabled { opacity:.5; cursor:not-allowed; }
+    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .muted { color:var(--soft); font-size:.78rem; }
+    .imgcard { display:flex; gap:12px; padding:10px 0; border-top:1px solid var(--line); align-items:center; }
+    .imgcard:first-of-type { border-top:none; }
+    .thumb { width:64px; height:64px; object-fit:cover; border-radius:8px; background:#eee; flex:none; border:1px solid var(--line); }
+    .imgcard .meta { flex:1; min-width:0; }
+    .imgcard .meta b { font-size:.9rem; }
+    .imgcard .path { font-size:.72rem; color:var(--soft); word-break:break-all; }
+    .ggrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(88px,1fr)); gap:8px; margin-top:12px; }
+    .gitem { position:relative; }
+    .gitem img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px; border:1px solid var(--line); background:#eee; }
+    .gitem .del { position:absolute; top:3px; right:3px; background:rgba(0,0,0,.6); color:#fff; border:none; border-radius:50%; width:22px; height:22px; padding:0; font-size:.9rem; line-height:22px; }
+    .badge { font-size:.68rem; background:#f0eadd; color:var(--soft); padding:2px 7px; border-radius:20px; }
+    .badge.warn { background:#fdeede; color:#b5651d; }
+    #log { position:fixed; left:0; right:0; bottom:0; background:var(--ink); color:#fff; padding:10px 16px; font-size:.82rem; transform:translateY(120%); transition:transform .25s; z-index:50; }
+    #log.show { transform:none; }
+    #log.ok { background:var(--ok); } #log.err { background:var(--err); }
+    .hide { display:none !important; }
+    .warnbox { background:#fdf3e6; border:1px solid #f0d9b5; color:#8a5a1c; font-size:.8rem; padding:10px 12px; border-radius:8px; margin-bottom:12px; }
+    details.adv summary { cursor:pointer; font-size:.82rem; color:var(--soft); }
+    .spin { display:inline-block; width:14px; height:14px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; animation:sp .7s linear infinite; vertical-align:-2px; }
+    @keyframes sp { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>청첩장 관리자 <span class="badge">GitHub 연동</span></h1>
+  <p class="sub">사진·문구를 수정하면 저장소에 커밋되어 1~2분 뒤 실제 청첩장에 반영됩니다.</p>
+
+  <!-- ===== 연결 ===== -->
+  <div class="card" id="authCard">
+    <h2>🔑 GitHub 연결</h2>
+    <div class="warnbox">
+      토큰은 이 브라우저에만 저장됩니다(localStorage). <b>Fine-grained 토큰</b>을 이 저장소에만 권한을 주고, <b>Contents: Read and write</b>로 발급하세요.
+      <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">토큰 발급 →</a>
+    </div>
+    <label>GitHub 토큰 (Personal Access Token)</label>
+    <input type="password" id="token" placeholder="github_pat_..." autocomplete="off" />
+    <details class="adv" style="margin-top:10px;">
+      <summary>저장소 설정 (기본값 그대로 두면 됩니다)</summary>
+      <label>owner</label><input type="text" id="owner" value="choieujin" />
+      <label>repo</label><input type="text" id="repo" value="wd-0ea4a06c36" />
+      <label>branch</label><input type="text" id="branch" value="main" />
+    </details>
+    <div class="row" style="margin-top:12px;">
+      <button id="connectBtn">연결 확인 &amp; 저장</button>
+      <span id="connStatus" class="muted"></span>
+    </div>
+  </div>
+
+  <div id="panels" class="hide">
+    <!-- ===== 오시는 길 문구 ===== -->
+    <div class="card">
+      <h2>🗺️ 오시는 길 문구</h2>
+      <p class="muted" id="locHint">불러오는 중…</p>
+      <div id="locFields"></div>
+      <div class="row" style="margin-top:12px;">
+        <button id="locSave" disabled>문구 저장(커밋)</button>
+        <button class="ghost mini" id="locReload">다시 불러오기</button>
+      </div>
+      <p class="muted" style="margin-top:8px;">※ 줄바꿈은 <code>&lt;br /&gt;</code>, 굵게는 <code>&lt;strong&gt;…&lt;/strong&gt;</code> 태그를 그대로 두고 한글만 고치세요.</p>
+    </div>
+
+    <!-- ===== 콘텐츠 사진 ===== -->
+    <div class="card">
+      <h2>🖼️ 콘텐츠 사진 교체</h2>
+      <p class="muted">사진을 고르면 자동으로 1280px WebP로 변환해 같은 자리에 덮어씁니다.</p>
+      <div id="contentImgs"></div>
+    </div>
+
+    <!-- ===== 갤러리 ===== -->
+    <div class="card">
+      <h2>📷 갤러리 관리</h2>
+      <p class="muted" id="galHint">불러오는 중…</p>
+      <div class="row" style="margin-top:10px;">
+        <input type="file" id="galAdd" accept="image/*" multiple class="hide" />
+        <button class="mini" id="galAddBtn">사진 추가</button>
+        <span id="galCount" class="muted"></span>
+      </div>
+      <div class="ggrid" id="galGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script>
+"use strict";
+// ---------- 설정 ----------
+const CFG_KEY = "wd_admin_cfg";
+let cfg = { owner:"choieujin", repo:"wd-0ea4a06c36", branch:"main", token:"" };
+
+const CONTENT_IMAGES = [
+  { label:"표지 사진(신랑·신부)", path:"assets/gallery/IMG_9952.webp" },
+  { label:"신랑 가족사진", path:"assets/images/childhood/family-groom.webp" },
+  { label:"신랑 애기사진 1", path:"assets/images/childhood/baby-groom-1.webp", cutout:true },
+  { label:"신랑 애기사진 2", path:"assets/images/childhood/baby-groom-2.webp", cutout:true },
+  { label:"신부 가족사진", path:"assets/images/childhood/family-bride.webp" },
+  { label:"신부 애기사진 1", path:"assets/images/childhood/baby-bride-1.webp", cutout:true },
+  { label:"신부 애기사진 2", path:"assets/images/childhood/baby-bride-2.webp", cutout:true },
+  { label:"스토리 사진 1", path:"assets/images/story/tulip.webp" },
+  { label:"스토리 사진 2", path:"assets/images/story/KK.webp" },
+  { label:"스토리 사진 3", path:"assets/images/story/sancheon.webp" },
+  { label:"스토리 사진 4", path:"assets/images/story/junjo.webp" },
+  { label:"스토리 사진 5", path:"assets/images/story/IMG_4201.webp" },
+  { label:"도보 약도", path:"assets/images/walk-map.webp" },
+];
+
+const EDIT_KEYS = [
+  { key:"loc-name",    label:"장소명",   plain:true },
+  { key:"loc-addr",    label:"주소",     plain:true },
+  { key:"loc-subway",  label:"지하철" },
+  { key:"loc-bus",     label:"버스" },
+  { key:"loc-car",     label:"자가용" },
+  { key:"loc-shuttle", label:"대절버스" },
+];
+
+// ---------- 유틸 ----------
+const $ = s => document.querySelector(s);
+function log(msg, kind="") {
+  const el = $("#log"); el.textContent = msg; el.className = "show " + kind;
+  if (kind) setTimeout(()=>{ el.className = el.className.replace("show",""); }, kind==="err"?6000:3000);
+}
+function apiPath(p){ return p.split("/").map(encodeURIComponent).join("/"); }
+
+function utf8ToB64(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin=""; const c=0x8000;
+  for(let i=0;i<bytes.length;i+=c) bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+c));
+  return btoa(bin);
+}
+function b64ToUtf8(b64){
+  const bin = atob(b64.replace(/\s/g,""));
+  const bytes = Uint8Array.from(bin, ch=>ch.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+async function blobToB64(blob){
+  const buf = await blob.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let bin=""; const c=0x8000;
+  for(let i=0;i<bytes.length;i+=c) bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+c));
+  return btoa(bin);
+}
+
+// ---------- GitHub API ----------
+async function gh(path, opts={}) {
+  const res = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}${path}`, {
+    ...opts,
+    headers: { "Authorization":`Bearer ${cfg.token}`, "Accept":"application/vnd.github+json", ...(opts.headers||{}) }
+  });
+  if (!res.ok) {
+    let detail=""; try { detail=(await res.json()).message||""; } catch(e){}
+    throw new Error(`GitHub ${res.status}: ${detail||res.statusText}`);
+  }
+  return res.status===204 ? null : res.json();
+}
+async function getFile(path){
+  const j = await gh(`/contents/${apiPath(path)}?ref=${cfg.branch}`);
+  return { sha:j.sha, base64:j.content };
+}
+async function getSha(path){
+  try { return (await getFile(path)).sha; }
+  catch(e){ if(String(e).includes("404")) return null; throw e; }
+}
+async function putFile(path, base64Content, message, sha){
+  const body = { message, content:base64Content, branch:cfg.branch };
+  if (sha) body.sha = sha;
+  return gh(`/contents/${apiPath(path)}`, { method:"PUT", body:JSON.stringify(body) });
+}
+
+// ---------- 이미지 최적화 ----------
+async function optimizeImage(file, maxW=1280, quality=0.82){
+  let bmp;
+  try { bmp = await createImageBitmap(file); }
+  catch(e){ throw new Error("이미지를 열 수 없습니다. HEIC 등은 지원되지 않아요 — JPG/PNG로 바꿔서 올려주세요."); }
+  let w=bmp.width, h=bmp.height;
+  if (w>maxW){ h=Math.round(h*maxW/w); w=maxW; }
+  const cv=document.createElement("canvas"); cv.width=w; cv.height=h;
+  cv.getContext("2d").drawImage(bmp,0,0,w,h);
+  const blob = await new Promise(r=> cv.toBlob(r,"image/webp",quality));
+  if(!blob) throw new Error("WebP 변환 실패");
+  return { blob, w, h };
+}
+
+// ---------- 연결 ----------
+function loadCfg(){
+  try { const s=JSON.parse(localStorage.getItem(CFG_KEY)||"{}"); Object.assign(cfg,s); } catch(e){}
+  $("#token").value=cfg.token||""; $("#owner").value=cfg.owner; $("#repo").value=cfg.repo; $("#branch").value=cfg.branch;
+}
+async function connect(){
+  cfg.token=$("#token").value.trim(); cfg.owner=$("#owner").value.trim();
+  cfg.repo=$("#repo").value.trim(); cfg.branch=$("#branch").value.trim();
+  if(!cfg.token){ log("토큰을 입력하세요","err"); return; }
+  $("#connectBtn").disabled=true; $("#connStatus").innerHTML='<span class="spin"></span> 확인 중…';
+  try {
+    const repo = await gh("");
+    localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+    $("#connStatus").innerHTML = `✅ ${repo.full_name} 연결됨`;
+    $("#panels").classList.remove("hide");
+    initPanels();
+  } catch(e){
+    $("#connStatus").innerHTML = `❌ ${e.message}`;
+    log(e.message,"err");
+  } finally { $("#connectBtn").disabled=false; }
+}
+
+// ---------- 패널 초기화 ----------
+function initPanels(){ loadLocation(); renderContentImages(); loadGallery(); }
+
+// ===== 오시는 길 =====
+let locHtml="", locSha="";
+async function loadLocation(){
+  $("#locHint").textContent="불러오는 중…"; $("#locSave").disabled=true;
+  try {
+    const f = await getFile("index.html");
+    locHtml = b64ToUtf8(f.base64); locSha=f.sha;
+    const box=$("#locFields"); box.innerHTML="";
+    let missing=[];
+    EDIT_KEYS.forEach(k=>{
+      const val = extractRegion(locHtml,k.key);
+      if(val===null){ missing.push(k.key); return; }
+      const wrap=document.createElement("div");
+      const lab=document.createElement("label"); lab.textContent=k.label;
+      const ta=document.createElement(k.plain?"input":"textarea");
+      if(k.plain) ta.type="text";
+      ta.value=val.trim(); ta.dataset.key=k.key;
+      wrap.appendChild(lab); wrap.appendChild(ta); box.appendChild(wrap);
+    });
+    $("#locHint").textContent = missing.length ? `일부 마커 없음: ${missing.join(", ")}` : "아래 문구를 고치고 저장하세요.";
+    $("#locSave").disabled=false;
+  } catch(e){ $("#locHint").textContent="불러오기 실패: "+e.message; log(e.message,"err"); }
+}
+function extractRegion(html,key){
+  const a=`<!--E:${key}-->`, b=`<!--/E:${key}-->`;
+  const i=html.indexOf(a), j=html.indexOf(b);
+  return (i<0||j<0)?null:html.slice(i+a.length,j);
+}
+function replaceRegion(html,key,val){
+  const a=`<!--E:${key}-->`, b=`<!--/E:${key}-->`;
+  const i=html.indexOf(a), j=html.indexOf(b);
+  return html.slice(0,i+a.length)+val+html.slice(j);
+}
+async function saveLocation(){
+  $("#locSave").disabled=true; $("#locSave").innerHTML='<span class="spin"></span> 저장 중…';
+  try {
+    let out=locHtml;
+    document.querySelectorAll("#locFields [data-key]").forEach(el=>{
+      out=replaceRegion(out, el.dataset.key, el.value);
+    });
+    if(out===locHtml){ log("변경 사항이 없습니다"); return; }
+    await putFile("index.html", utf8ToB64(out), "admin: 오시는 길 문구 수정", locSha);
+    locHtml=out;
+    await loadLocation();
+    log("문구 저장 완료 — 1~2분 뒤 반영","ok");
+  } catch(e){ log(e.message,"err"); }
+  finally { $("#locSave").disabled=false; $("#locSave").textContent="문구 저장(커밋)"; }
+}
+
+// ===== 콘텐츠 사진 =====
+function renderContentImages(){
+  const box=$("#contentImgs"); box.innerHTML="";
+  CONTENT_IMAGES.forEach((it,idx)=>{
+    const card=document.createElement("div"); card.className="imgcard";
+    card.innerHTML=`
+      <img class="thumb" src="${it.path}?t=${Date.now()}" alt="" onerror="this.style.opacity=.3" />
+      <div class="meta">
+        <b>${it.label}</b> ${it.cutout?'<span class="badge warn">투명배경 권장</span>':''}
+        <div class="path">${it.path}</div>
+        <div class="row" style="margin-top:6px;">
+          <input type="file" accept="image/*" data-idx="${idx}" class="cfile hide" />
+          <button class="mini ghost cpick" data-idx="${idx}">사진 선택</button>
+          <span class="muted cstat" data-idx="${idx}"></span>
+        </div>
+      </div>`;
+    box.appendChild(card);
+  });
+  box.querySelectorAll(".cpick").forEach(b=> b.onclick=()=> box.querySelector(`.cfile[data-idx="${b.dataset.idx}"]`).click());
+  box.querySelectorAll(".cfile").forEach(inp=> inp.onchange=()=> onContentPick(inp));
+}
+async function onContentPick(inp){
+  const idx=+inp.dataset.idx, it=CONTENT_IMAGES[idx];
+  const stat=document.querySelector(`.cstat[data-idx="${idx}"]`);
+  const file=inp.files[0]; if(!file) return;
+  stat.innerHTML='<span class="spin"></span> 변환 중…';
+  try {
+    const { blob,w,h } = await optimizeImage(file);
+    const kb=Math.round(blob.size/1024);
+    if(!confirm(`${it.label}\n${w}×${h}, ${kb}KB 로 교체하시겠어요?`)){ stat.textContent=""; inp.value=""; return; }
+    stat.innerHTML='<span class="spin"></span> 업로드 중…';
+    const sha=await getSha(it.path);
+    await putFile(it.path, await blobToB64(blob), `admin: ${it.label} 교체`, sha);
+    stat.textContent="✅ 교체됨";
+    const thumb=inp.closest(".imgcard").querySelector(".thumb");
+    thumb.src=it.path+"?t="+Date.now(); thumb.style.opacity=1;
+    log(`${it.label} 교체 완료 — 1~2분 뒤 반영`,"ok");
+  } catch(e){ stat.textContent="❌"; log(e.message,"err"); }
+  finally { inp.value=""; }
+}
+
+// ===== 갤러리 =====
+let galList=[], galSha="";
+async function loadGallery(){
+  $("#galHint").textContent="불러오는 중…";
+  try {
+    const f=await getFile("assets/js/gallery-list.js");
+    galSha=f.sha; galList=parseGallery(b64ToUtf8(f.base64));
+    $("#galHint").textContent="사진을 추가하거나 × 로 삭제할 수 있어요.";
+    renderGallery();
+  } catch(e){ $("#galHint").textContent="불러오기 실패: "+e.message; log(e.message,"err"); }
+}
+function parseGallery(js){
+  const m=js.match(/GALLERY\s*=\s*\[([\s\S]*?)\]/);
+  return m ? [...m[1].matchAll(/["']([^"']+)["']/g)].map(x=>x[1]) : [];
+}
+function buildGalleryJs(list){
+  const items=list.map(n=>`  "${n.replace(/"/g,'\\"')}",`).join("\n");
+  return `// 자동 생성 파일 — admin 페이지가 갱신합니다.\nwindow.GALLERY = [\n${items}\n];\n`;
+}
+function renderGallery(){
+  $("#galCount").textContent=`총 ${galList.length}장`;
+  const grid=$("#galGrid"); grid.innerHTML="";
+  galList.forEach(name=>{
+    const d=document.createElement("div"); d.className="gitem";
+    d.innerHTML=`<img loading="lazy" src="assets/gallery/${encodeURIComponent(name)}" alt="" onerror="this.style.opacity=.3" />
+                 <button class="del" title="삭제">×</button>`;
+    d.querySelector(".del").onclick=()=>removeGallery(name);
+    grid.appendChild(d);
+  });
+}
+async function commitGallery(message){
+  const res=await putFile("assets/js/gallery-list.js", utf8ToB64(buildGalleryJs(galList)), message, galSha);
+  galSha=res.content.sha;
+}
+async function removeGallery(name){
+  if(!confirm(`갤러리에서 "${name}" 를 뺄까요?\n(파일은 저장소에 남고 목록에서만 제거됩니다)`)) return;
+  const prev=galList.slice();
+  galList=galList.filter(n=>n!==name); renderGallery();
+  try { await commitGallery(`admin: 갤러리에서 ${name} 제거`); log("갤러리 수정 완료 — 1~2분 뒤 반영","ok"); }
+  catch(e){ galList=prev; renderGallery(); log(e.message,"err"); }
+}
+async function addGallery(files){
+  for(const file of files){
+    log(`${file.name} 변환·업로드 중…`);
+    try {
+      const { blob }=await optimizeImage(file);
+      const fname=uniqueName(file.name);
+      await putFile(`assets/gallery/${fname}`, await blobToB64(blob), `admin: 갤러리 사진 추가 ${fname}`);
+      galList.push(fname);
+      await commitGallery(`admin: 갤러리 목록에 ${fname} 추가`);
+      renderGallery();
+      log(`${fname} 추가 완료`,"ok");
+    } catch(e){ log(`${file.name}: ${e.message}`,"err"); }
+  }
+}
+function uniqueName(orig){
+  let base=(orig.replace(/\.[^.]+$/,"")||"photo").replace(/[^\w-]/g,"_");
+  let name=base+".webp", i=2;
+  while(galList.includes(name)){ name=`${base}_${i}.webp`; i++; }
+  return name;
+}
+
+// ---------- 이벤트 ----------
+$("#connectBtn").onclick=connect;
+$("#locSave").onclick=saveLocation;
+$("#locReload").onclick=loadLocation;
+$("#galAddBtn").onclick=()=>$("#galAdd").click();
+$("#galAdd").onchange=e=>{ if(e.target.files.length) addGallery([...e.target.files]); e.target.value=""; };
+
+loadCfg();
+if(cfg.token) connect();
+</script>
+</body>
+</html>
