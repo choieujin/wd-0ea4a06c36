@@ -33,8 +33,14 @@
     .imgcard .path { font-size:.72rem; color:var(--soft); word-break:break-all; }
     .ggrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(88px,1fr)); gap:8px; margin-top:12px; }
     .gitem { position:relative; }
-    .gitem img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px; border:1px solid var(--line); background:#eee; }
+    .gitem img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px; border:1px solid var(--line); background:#eee; cursor:grab; }
     .gitem .del { position:absolute; top:3px; right:3px; background:rgba(0,0,0,.6); color:#fff; border:none; border-radius:50%; width:22px; height:22px; padding:0; font-size:.9rem; line-height:22px; }
+    .gitem .ord { position:absolute; top:3px; left:3px; background:rgba(0,0,0,.62); color:#fff; font-size:.64rem; height:17px; line-height:17px; min-width:17px; text-align:center; border-radius:4px; padding:0 4px; }
+    .gitem .mvbar { position:absolute; left:3px; right:3px; bottom:3px; display:flex; justify-content:space-between; gap:4px; }
+    .gitem .mv { background:rgba(0,0,0,.55); color:#fff; border:none; width:26px; height:24px; padding:0; border-radius:6px; font-size:1.05rem; line-height:24px; font-weight:700; }
+    .gitem .mv:disabled { opacity:.25; }
+    .gitem.dragging { opacity:.35; }
+    .gitem.dragover { outline:2px dashed var(--rose); outline-offset:2px; border-radius:8px; }
     .badge { font-size:.68rem; background:#f0eadd; color:var(--soft); padding:2px 7px; border-radius:20px; }
     .badge.warn { background:#fdeede; color:#b5651d; }
     #log { position:fixed; left:0; right:0; bottom:0; background:var(--ink); color:#fff; padding:10px 16px; font-size:.82rem; transform:translateY(120%); transition:transform .25s; z-index:50; }
@@ -100,8 +106,11 @@
       <div class="row" style="margin-top:10px;">
         <input type="file" id="galAdd" accept="image/*" multiple class="hide" />
         <button class="mini" id="galAddBtn">사진 추가</button>
+        <button class="mini hide" id="galSaveOrder">순서 저장</button>
+        <button class="mini ghost hide" id="galReloadBtn">되돌리기</button>
         <span id="galCount" class="muted"></span>
       </div>
+      <p class="muted" style="margin-top:6px;">‹ › 버튼으로 순서를 바꾸거나(모바일), 썸네일을 드래그해서 옮기세요(PC). 바꾼 뒤 <b>순서 저장</b>을 눌러야 반영됩니다.</p>
       <div class="ggrid" id="galGrid"></div>
     </div>
   </div>
@@ -323,13 +332,15 @@ async function onContentPick(inp){
 }
 
 // ===== 갤러리 =====
-let galList=[], galSha="";
+let galList=[], galSha="", galDirty=false, dragFrom=null;
+function setDirty(v){ galDirty=v; $("#galSaveOrder").classList.toggle("hide",!v); $("#galReloadBtn").classList.toggle("hide",!v); }
 async function loadGallery(){
   $("#galHint").textContent="불러오는 중…";
   try {
     const f=await getFile("assets/js/gallery-list.js");
     galSha=f.sha; galList=parseGallery(b64ToUtf8(f.base64));
-    $("#galHint").textContent="사진을 추가하거나 × 로 삭제할 수 있어요.";
+    setDirty(false);
+    $("#galHint").textContent="추가·삭제하거나, 순서를 바꿀 수 있어요.";
     renderGallery();
   } catch(e){ $("#galHint").textContent="불러오기 실패: "+e.message; log(e.message,"err"); }
 }
@@ -342,19 +353,49 @@ function buildGalleryJs(list){
   return `// 자동 생성 파일 — admin 페이지가 갱신합니다.\nwindow.GALLERY = [\n${items}\n];\n`;
 }
 function renderGallery(){
-  $("#galCount").textContent=`총 ${galList.length}장`;
+  $("#galCount").textContent=`총 ${galList.length}장${galDirty?" · 순서 변경됨(미저장)":""}`;
   const grid=$("#galGrid"); grid.innerHTML="";
-  galList.forEach(name=>{
-    const d=document.createElement("div"); d.className="gitem";
-    d.innerHTML=`<img loading="lazy" src="assets/gallery/${encodeURIComponent(name)}" alt="" onerror="this.style.opacity=.3" />
-                 <button class="del" title="삭제">×</button>`;
-    d.querySelector(".del").onclick=()=>removeGallery(name);
+  galList.forEach((name,i)=>{
+    const d=document.createElement("div"); d.className="gitem"; d.draggable=true; d.dataset.i=i;
+    d.innerHTML=`
+      <img loading="lazy" src="assets/gallery/${encodeURIComponent(name)}" alt="" onerror="this.style.opacity=.3" />
+      <span class="ord">${i+1}</span>
+      <button class="del" title="삭제">×</button>
+      <div class="mvbar">
+        <button class="mv" data-d="-1" title="앞으로" ${i===0?"disabled":""}>‹</button>
+        <button class="mv" data-d="1" title="뒤로" ${i===galList.length-1?"disabled":""}>›</button>
+      </div>`;
+    d.querySelector(".del").onclick=e=>{ e.stopPropagation(); removeGallery(name); };
+    d.querySelectorAll(".mv").forEach(b=> b.onclick=e=>{ e.stopPropagation(); moveItem(i, +b.dataset.d); });
+    d.addEventListener("dragstart",()=>{ dragFrom=i; d.classList.add("dragging"); });
+    d.addEventListener("dragend",()=>d.classList.remove("dragging"));
+    d.addEventListener("dragover",e=>{ e.preventDefault(); d.classList.add("dragover"); });
+    d.addEventListener("dragleave",()=>d.classList.remove("dragover"));
+    d.addEventListener("drop",e=>{ e.preventDefault(); d.classList.remove("dragover"); dropTo(i); });
     grid.appendChild(d);
   });
+}
+function moveItem(i,dir){
+  const j=i+dir; if(j<0||j>=galList.length) return;
+  [galList[i],galList[j]]=[galList[j],galList[i]];
+  setDirty(true); renderGallery();
+}
+function dropTo(to){
+  if(dragFrom===null||dragFrom===to) return;
+  const [it]=galList.splice(dragFrom,1);
+  galList.splice(to,0,it);
+  dragFrom=null; setDirty(true); renderGallery();
+}
+async function saveOrder(){
+  const btn=$("#galSaveOrder"); btn.disabled=true; btn.innerHTML='<span class="spin"></span> 저장 중…';
+  try { await commitGallery("admin: 갤러리 사진 순서 변경"); renderGallery(); log("순서 저장 완료 — 1~2분 뒤 반영","ok"); }
+  catch(e){ log(e.message,"err"); }
+  finally { btn.disabled=false; btn.textContent="순서 저장"; }
 }
 async function commitGallery(message){
   const res=await putFile("assets/js/gallery-list.js", utf8ToB64(buildGalleryJs(galList)), message, galSha);
   galSha=res.content.sha;
+  setDirty(false);
 }
 async function removeGallery(name){
   if(!confirm(`갤러리에서 "${name}" 를 뺄까요?\n(파일은 저장소에 남고 목록에서만 제거됩니다)`)) return;
@@ -389,6 +430,8 @@ $("#connectBtn").onclick=connect;
 $("#locSave").onclick=saveLocation;
 $("#locReload").onclick=loadLocation;
 $("#galAddBtn").onclick=()=>$("#galAdd").click();
+$("#galSaveOrder").onclick=saveOrder;
+$("#galReloadBtn").onclick=loadGallery;
 $("#galAdd").onchange=e=>{ if(e.target.files.length) addGallery([...e.target.files]); e.target.value=""; };
 
 loadCfg();
