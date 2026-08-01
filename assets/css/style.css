@@ -350,7 +350,7 @@ section.paper + section.paper::after {
 }
 /* ===== Story gallery wall (좌상단 글씨 · 격자 정렬 액자) ===== */
 .story-mosaic {
-  margin-top: 64px;              /* 문구 이전 빈 공간 */
+  margin-top: 128px;              /* 문구 이전 빈 공간 */
   width: 100%;
   aspect-ratio: 1 / 1;
   display: grid;
