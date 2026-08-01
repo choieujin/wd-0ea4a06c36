@@ -40,4 +40,6 @@ window.GALLERY = [
   "CHO07588.webp",
   "CHO07788.webp",
   "CHO05778.webp",
+  "CHO08012.webp",
+  "CHO05891.webp",
 ];
