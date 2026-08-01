@@ -39,4 +39,5 @@ window.GALLERY = [
   "IMG_6734.webp",
   "IMG_6740.webp",
   "DANCE_EDIT.webp",
+  "IMG_8493.webp",
 ];
