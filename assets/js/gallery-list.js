@@ -1,7 +1,6 @@
 // 자동 생성 파일 — admin 페이지가 갱신합니다.
 window.GALLERY = [
   "CHO08012.webp",
-  "IMG_8923.webp",
   "CHO08054.webp",
   "IMG_9952.webp",
   "IMG_9953.webp",
@@ -17,6 +16,7 @@ window.GALLERY = [
   "CHO08113.webp",
   "CHO06502.webp",
   "CHO06557.webp",
+  "CHO06288.webp",
   "CHO05891.webp",
   "CHO07910.webp",
   "CHO06685.webp",
@@ -39,5 +39,4 @@ window.GALLERY = [
   "IMG_6717.webp",
   "IMG_6734.webp",
   "IMG_6740.webp",
-  "CHO06288.webp",
 ];
