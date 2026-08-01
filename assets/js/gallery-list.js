@@ -2,7 +2,6 @@
 window.GALLERY = [
   "CHO08012.webp",
   "CHO08054.webp",
-  "IMG_9952.webp",
   "IMG_9953.webp",
   "CHO05512.webp",
   "CHO07220.webp",
