@@ -1,4 +1,4 @@
-// 자동 생성 파일 — scripts/build-gallery.sh 가 갱신합니다.
+// 자동 생성 파일 — admin 페이지가 갱신합니다.
 window.GALLERY = [
   "IMG_0865.webp",
   "IMG_2108.webp",
@@ -35,4 +35,5 @@ window.GALLERY = [
   "IMG_9951.webp",
   "IMG_9952.webp",
   "IMG_9953.webp",
+  "CHO05512.webp",
 ];
