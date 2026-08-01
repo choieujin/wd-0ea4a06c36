@@ -231,7 +231,7 @@ section.paper + section.paper::after {
   box-shadow: 0 10px 26px rgba(0,0,0,0.45);
 }
 
-.cover__heart { margin-top: -70px; position: relative; z-index: 3; }
+.cover__heart { margin-top: -120px; position: relative; z-index: 3; }
 .cover__names {
   font-family: var(--sans);
   font-weight: 500;
