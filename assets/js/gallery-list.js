@@ -10,7 +10,6 @@ window.GALLERY = [
   "IMG_6717.webp",
   "IMG_6734.webp",
   "IMG_6740.webp",
-  "IMG_7198.webp",
   "IMG_7211.webp",
   "IMG_7430.webp",
   "IMG_7504.webp",
