@@ -17,6 +17,8 @@ window.GALLERY = [
   "CHO08113.webp",
   "CHO06502.webp",
   "CHO06557.webp",
+  "20260513_120132.webp",
+  "IMG_7510.webp",
   "CHO06288.webp",
   "CHO06685.webp",
   "CHO05778.webp",
@@ -38,6 +40,4 @@ window.GALLERY = [
   "IMG_6734.webp",
   "IMG_6740.webp",
   "DANCE_EDIT.webp",
-  "20260513_120132.webp",
-  "IMG_7510.webp",
 ];
