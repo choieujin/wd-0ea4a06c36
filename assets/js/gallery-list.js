@@ -22,7 +22,6 @@ window.GALLERY = [
   "CHO06288.webp",
   "CHO06685.webp",
   "CHO05778.webp",
-  "bride_edit.webp",
   "CHO07876.webp",
   "CHO08102.webp",
   "CHO08171.webp",
