@@ -278,7 +278,10 @@ async function connect(){
 }
 
 // ---------- 패널 초기화 ----------
-function initPanels(){ loadLocation(); renderContentImages(); loadGallery(); }
+function initPanels(){
+  $("#ogThumb").src="assets/images/og.jpg?t="+Date.now(); // 새로고침해도 최신 썸네일 보이게
+  loadLocation(); renderContentImages(); loadGallery();
+}
 
 // ===== 오시는 길 =====
 let locHtml="", locSha="";
