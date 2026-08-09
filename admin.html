@@ -31,6 +31,14 @@
     .imgcard .meta { flex:1; min-width:0; }
     .imgcard .meta b { font-size:.9rem; }
     .imgcard .path { font-size:.72rem; color:var(--soft); word-break:break-all; }
+    .ogthumb { width:100%; max-width:360px; aspect-ratio:1200/630; object-fit:cover; border-radius:8px; border:1px solid var(--line); background:#eee; display:block; }
+    .cropwrap { position:relative; width:100%; max-width:360px; aspect-ratio:1200/630; border-radius:8px; overflow:hidden; background:#000; touch-action:none; cursor:grab; user-select:none; -webkit-user-select:none; }
+    .cropwrap.grabbing { cursor:grabbing; }
+    .cropwrap canvas { width:100%; height:100%; display:block; pointer-events:none; }
+    .cropwrap::after { content:""; position:absolute; inset:0; pointer-events:none;
+      background-image:linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3)),linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3)),linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3)),linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3));
+      background-repeat:no-repeat; background-size:1px 100%,1px 100%,100% 1px,100% 1px; background-position:33.33% 0,66.66% 0,0 33.33%,0 66.66%; }
+    input[type=range] { width:100%; accent-color:var(--rose); }
     .ggrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(88px,1fr)); gap:8px; margin-top:12px; }
     .gitem { position:relative; }
     .gitem img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px; border:1px solid var(--line); background:#eee; cursor:grab; }
@@ -101,6 +109,27 @@
       <h2>🖼️ 콘텐츠 사진 교체</h2>
       <p class="muted">사진을 고르면 자동으로 1280px WebP로 변환해 같은 자리에 덮어씁니다.</p>
       <div id="contentImgs"></div>
+    </div>
+
+    <!-- ===== 공유 썸네일 (OG) ===== -->
+    <div class="card">
+      <h2>🔗 공유 썸네일 (카톡·문자 미리보기)</h2>
+      <p class="muted">링크 공유 시 뜨는 미리보기 이미지예요. 가로:세로 <b>1.91:1</b>로 잘립니다. 사진을 고른 뒤 <b>드래그로 위치</b>, <b>슬라이더로 확대</b>를 맞춰 저장하세요.</p>
+      <img id="ogThumb" class="ogthumb" style="margin-top:10px;" src="assets/images/og.jpg" alt="현재 썸네일" onerror="this.style.opacity=.3" />
+      <div class="row" style="margin-top:10px;">
+        <input type="file" id="ogFile" accept="image/*" class="hide" />
+        <button class="mini ghost" id="ogPick">사진 선택</button>
+      </div>
+      <div id="ogEditor" class="hide" style="margin-top:12px;">
+        <div class="cropwrap" id="ogCropWrap"><canvas id="ogCanvas"></canvas></div>
+        <label for="ogZoom">확대</label>
+        <input type="range" id="ogZoom" min="100" max="300" value="100" />
+        <div class="row" style="margin-top:10px;">
+          <button class="mini" id="ogSave">이 썸네일로 저장</button>
+          <button class="mini ghost" id="ogCancel">취소</button>
+          <span id="ogStat" class="muted"></span>
+        </div>
+      </div>
     </div>
 
     <!-- ===== 갤러리 ===== -->
@@ -341,6 +370,56 @@ async function onContentPick(inp){
   finally { inp.value=""; }
 }
 
+// ===== 공유 썸네일(OG) 크롭 =====
+const OGW=1200, OGH=630;
+let ogImg=null, ogZ=1, ogPX=50, ogPY=50, ogDrag=false, ogLX=0, ogLY=0;
+function ogParams(iw,ih,fw,fh,z,px,py){
+  const scale=Math.max(fw/iw,fh/ih)*z;
+  const sw=iw*scale, sh=ih*scale;
+  const overX=sw-fw, overY=sh-fh;
+  return { sw, sh, overX, overY, dx:-overX*(px/100), dy:-overY*(py/100) };
+}
+function ogRender(){
+  if(!ogImg) return;
+  const cv=$("#ogCanvas"), ctx=cv.getContext("2d");
+  const p=ogParams(ogImg.naturalWidth,ogImg.naturalHeight,cv.width,cv.height,ogZ,ogPX,ogPY);
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.drawImage(ogImg,p.dx,p.dy,p.sw,p.sh);
+}
+function ogLoad(file){
+  const url=URL.createObjectURL(file), im=new Image();
+  im.onload=()=>{ URL.revokeObjectURL(url); ogImg=im; ogZ=1; ogPX=50; ogPY=50;
+    $("#ogZoom").value=100; $("#ogStat").textContent="";
+    const cv=$("#ogCanvas"); cv.width=OGW/2; cv.height=OGH/2;   // 600×315 미리보기
+    $("#ogEditor").classList.remove("hide"); ogRender(); };
+  im.onerror=()=>{ URL.revokeObjectURL(url); log("이미지를 열 수 없습니다. HEIC 등은 JPG/PNG로 변환 후 올려주세요.","err"); };
+  im.src=url;
+}
+function ogPan(mx,my){
+  const cv=$("#ogCanvas"), wrap=$("#ogCropWrap");
+  const p=ogParams(ogImg.naturalWidth,ogImg.naturalHeight,cv.width,cv.height,ogZ,ogPX,ogPY);
+  const kx=cv.width/wrap.clientWidth, ky=cv.height/wrap.clientHeight;
+  if(p.overX>0) ogPX=Math.min(100,Math.max(0, ogPX-(mx*kx)/p.overX*100));
+  if(p.overY>0) ogPY=Math.min(100,Math.max(0, ogPY-(my*ky)/p.overY*100));
+  ogRender();
+}
+async function ogSaveThumb(){
+  if(!ogImg) return;
+  const btn=$("#ogSave"); btn.disabled=true; btn.innerHTML='<span class="spin"></span> 저장 중…';
+  try{
+    const out=document.createElement("canvas"); out.width=OGW; out.height=OGH;
+    const p=ogParams(ogImg.naturalWidth,ogImg.naturalHeight,OGW,OGH,ogZ,ogPX,ogPY);
+    out.getContext("2d").drawImage(ogImg,p.dx,p.dy,p.sw,p.sh);
+    const blob=await new Promise(r=>out.toBlob(r,"image/jpeg",0.85));
+    const sha=await getSha("assets/images/og.jpg");
+    await putFile("assets/images/og.jpg", await blobToB64(blob), "admin: 공유 썸네일(OG) 교체", sha);
+    $("#ogThumb").src="assets/images/og.jpg?t="+Date.now();
+    $("#ogEditor").classList.add("hide"); ogImg=null; $("#ogFile").value="";
+    log("공유 썸네일 저장 완료 — 카톡 미리보기는 캐시로 늦게 갱신될 수 있어요","ok");
+  }catch(e){ log(e.message,"err"); }
+  finally{ btn.disabled=false; btn.textContent="이 썸네일로 저장"; }
+}
+
 // ===== 갤러리 =====
 let galList=[], galSha="", galDirty=false, dragFrom=null;
 function setDirty(v){ galDirty=v; $("#galSaveOrder").classList.toggle("hide",!v); $("#galReloadBtn").classList.toggle("hide",!v); }
@@ -454,6 +533,17 @@ $("#galAddBtn").onclick=()=>$("#galAdd").click();
 $("#galSaveOrder").onclick=saveOrder;
 $("#galReloadBtn").onclick=loadGallery;
 $("#galAdd").onchange=e=>{ if(e.target.files.length) addGallery([...e.target.files]); e.target.value=""; };
+$("#ogPick").onclick=()=>$("#ogFile").click();
+$("#ogFile").onchange=e=>{ if(e.target.files[0]) ogLoad(e.target.files[0]); };
+$("#ogZoom").oninput=e=>{ ogZ=+e.target.value/100; ogRender(); };
+$("#ogSave").onclick=ogSaveThumb;
+$("#ogCancel").onclick=()=>{ $("#ogEditor").classList.add("hide"); ogImg=null; $("#ogFile").value=""; };
+(()=>{ const wrap=$("#ogCropWrap");
+  wrap.addEventListener("pointerdown",e=>{ if(!ogImg)return; ogDrag=true; ogLX=e.clientX; ogLY=e.clientY; try{ wrap.setPointerCapture(e.pointerId); }catch(_){}; wrap.classList.add("grabbing"); });
+  wrap.addEventListener("pointermove",e=>{ if(!ogDrag)return; const mx=e.clientX-ogLX, my=e.clientY-ogLY; ogLX=e.clientX; ogLY=e.clientY; ogPan(mx,my); });
+  const stop=()=>{ ogDrag=false; wrap.classList.remove("grabbing"); };
+  wrap.addEventListener("pointerup",stop); wrap.addEventListener("pointercancel",stop);
+})();
 
 loadCfg();
 if(cfg.token) connect();
