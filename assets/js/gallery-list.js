@@ -29,4 +29,5 @@ window.GALLERY = [
   "IMG_6705.webp",
   "IMG_6717.webp",
   "IMG_6740.webp",
+  "IMG_8493_2.webp",
 ];
