@@ -31,4 +31,5 @@ window.GALLERY = [
   "IMG_6740.webp",
   "IMG_8493_2.webp",
   "IMG_7510_2.webp",
+  "20260513_120132_2.webp",
 ];
