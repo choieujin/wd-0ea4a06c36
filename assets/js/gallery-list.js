@@ -30,5 +30,4 @@ window.GALLERY = [
   "IMG_6717.webp",
   "IMG_6740.webp",
   "IMG_8493_2.webp",
-  "ChatGPT_Image_Aug_2__2026__12_09_36_AM.webp",
 ];
