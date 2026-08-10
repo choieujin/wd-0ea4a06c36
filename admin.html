@@ -406,6 +406,22 @@ function ogPan(mx,my){
   if(p.overY>0) ogPY=Math.min(100,Math.max(0, ogPY-(my*ky)/p.overY*100));
   ogRender();
 }
+// 카톡·페북은 og:image를 URL 단위로 캐시한다. 파일만 바꾸면 주소가 그대로라 옛 썸네일이 계속 나가므로,
+// index.html의 og:image ?v= 값을 함께 올려 스크래퍼가 새 주소로 인식하게 만든다.
+const OG_IMAGE_RE = /(<meta\s+property="og:image"\s+content="[^"]*?og\.jpg)(\?v=[^"]*)?"/;
+async function bumpOgVersion(){
+  const f = await getFile("index.html");
+  const html = b64ToUtf8(f.base64);
+  if(!OG_IMAGE_RE.test(html)){
+    log("index.html에서 og:image 태그를 찾지 못했습니다 — 카톡 미리보기가 늦게 바뀔 수 있어요","err");
+    return false;
+  }
+  const stamp = new Date().toISOString().replace(/\D/g,"").slice(0,14); // 예: 20260809212338
+  const out = html.replace(OG_IMAGE_RE, `$1?v=${stamp}"`);
+  if(out===html) return false;
+  await putFile("index.html", utf8ToB64(out), "admin: 공유 썸네일 캐시 버전 갱신", f.sha);
+  return true;
+}
 async function ogSaveThumb(){
   if(!ogImg) return;
   const btn=$("#ogSave"); btn.disabled=true; btn.innerHTML='<span class="spin"></span> 저장 중…';
@@ -416,9 +432,13 @@ async function ogSaveThumb(){
     const blob=await new Promise(r=>out.toBlob(r,"image/jpeg",0.85));
     const sha=await getSha("assets/images/og.jpg");
     await putFile("assets/images/og.jpg", await blobToB64(blob), "admin: 공유 썸네일(OG) 교체", sha);
+    const bumped = await bumpOgVersion();
+    await loadLocation(); // index.html이 바뀌었으니 '오시는 길' 편집기의 sha를 새로 받아둔다
     $("#ogThumb").src="assets/images/og.jpg?t="+Date.now();
     $("#ogEditor").classList.add("hide"); ogImg=null; $("#ogFile").value="";
-    log("공유 썸네일 저장 완료 — 카톡 미리보기는 캐시로 늦게 갱신될 수 있어요","ok");
+    log(bumped
+      ? "공유 썸네일 저장 완료 — 1~2분 뒤 배포되면 새로 공유하는 링크부터 바뀐 썸네일이 나옵니다"
+      : "공유 썸네일 저장 완료 — 카톡 미리보기는 캐시로 늦게 갱신될 수 있어요","ok");
   }catch(e){ log(e.message,"err"); }
   finally{ btn.disabled=false; btn.textContent="이 썸네일로 저장"; }
 }
