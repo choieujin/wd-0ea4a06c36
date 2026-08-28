@@ -53,6 +53,18 @@
     .advlb img { max-width:94vw; max-height:88vh; object-fit:contain; border-radius:6px; }
     .advlb .x { position:absolute; top:16px; right:18px; background:none; border:none; color:#fff; font-size:2.2rem; line-height:1; padding:0; }
     .advlb .cap { position:absolute; bottom:20px; left:0; right:0; text-align:center; color:#fff; font-size:.8rem; opacity:.85; word-break:break-all; padding:0 16px; }
+    .accgrp { border-top:1px solid var(--line); margin-top:16px; padding-top:14px; }
+    .accgrp:first-child { border-top:none; margin-top:0; padding-top:0; }
+    .accgrp > h3 { font-size:.94rem; margin-bottom:10px; }
+    .accrow { border:1px solid var(--line); border-radius:10px; padding:10px 12px 12px; margin-bottom:10px; background:#fdfcf8; }
+    .accrow__hd { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .accrow__n { font-size:.78rem; color:var(--soft); }
+    .accrow__btns { display:flex; gap:6px; }
+    .accrow__f { display:grid; grid-template-columns:1fr 1fr; gap:0 10px; }
+    .accrow__f > div:last-child { grid-column:1 / -1; }
+    .accrow__prev { margin-top:9px; word-break:break-all; }
+    .accrow__prev b { color:var(--ink); font-weight:500; }
+    .accempty { font-size:.82rem; color:var(--soft); padding:8px 0 10px; }
     .badge { font-size:.68rem; background:#f0eadd; color:var(--soft); padding:2px 7px; border-radius:20px; }
     .badge.warn { background:#fdeede; color:#b5651d; }
     #log { position:fixed; left:0; right:0; bottom:0; background:var(--ink); color:#fff; padding:10px 16px; font-size:.82rem; transform:translateY(120%); transition:transform .25s; z-index:50; }
@@ -102,6 +114,21 @@
         <button class="ghost mini" id="locReload">다시 불러오기</button>
       </div>
       <p class="muted" style="margin-top:8px;">※ 줄바꿈은 <code>&lt;br /&gt;</code>, 굵게는 <code>&lt;strong&gt;…&lt;/strong&gt;</code> 태그를 그대로 두고 한글만 고치세요.</p>
+    </div>
+
+    <!-- ===== 마음 전하실 곳 (계좌) ===== -->
+    <div class="card">
+      <h2>💌 마음 전하실 곳 (계좌)</h2>
+      <p class="muted" id="accHint">불러오는 중…</p>
+      <div id="accGroups"></div>
+      <div class="row" style="margin-top:14px;">
+        <button id="accSave" disabled>계좌 저장(커밋)</button>
+        <button class="ghost mini" id="accReload">다시 불러오기</button>
+      </div>
+      <p class="muted" style="margin-top:8px;">
+        ※ <b>관계</b>는 비워두면 “은행 · 예금주”로만 표시됩니다. (예: 관계에 <b>신랑</b> → 청첩장에는 <b>국민은행 · 신랑 박종현</b>)<br />
+        ※ 하객이 <b>복사</b>를 누르면 계좌번호의 숫자만 복사됩니다. 하이픈을 넣어 적으셔도 됩니다.
+      </p>
     </div>
 
     <!-- ===== 콘텐츠 사진 ===== -->
@@ -279,7 +306,7 @@ async function connect(){
 // ---------- 패널 초기화 ----------
 function initPanels(){
   $("#ogThumb").src="assets/images/og.jpg?t="+Date.now(); // 새로고침해도 최신 썸네일 보이게
-  loadLocation(); renderContentImages(); loadGallery();
+  loadLocation(); loadAccounts(); renderContentImages(); loadGallery();
 }
 
 // ===== 오시는 길 =====
@@ -324,11 +351,171 @@ async function saveLocation(){
     });
     if(out===locHtml){ log("변경 사항이 없습니다"); return; }
     await putFile("index.html", utf8ToB64(out), "admin: 오시는 길 문구 수정", locSha);
-    locHtml=out;
-    await loadLocation();
+    await refreshIndexPanels();
     log("문구 저장 완료 — 1~2분 뒤 반영","ok");
   } catch(e){ log(e.message,"err"); }
   finally { $("#locSave").disabled=false; $("#locSave").textContent="문구 저장(커밋)"; }
+}
+
+// index.html은 여러 패널이 나눠 고치므로, 한 곳이 커밋하면 나머지 패널의 sha가 낡는다.
+// 저장 직후 전부 다시 읽어 다음 저장이 409로 실패하지 않게 한다.
+async function refreshIndexPanels(){
+  await loadLocation();
+  await loadAccounts();
+}
+
+// ===== 마음 전하실 곳 (계좌) =====
+const ACC_GROUPS = [
+  { key:"acc-groom", label:"신랑 측 마음 전하실 곳" },
+  { key:"acc-bride", label:"신부 측 마음 전하실 곳" },
+];
+let accHtml="", accSha="", accData={};
+
+function escHtml(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function escAttr(s){ return escHtml(s).replace(/"/g,"&quot;"); }
+// 청첩장에 보이는 줄: "국민은행 · 신랑 박종현" (관계가 비면 "국민은행 · 박종현")
+function accLabel(it){
+  const who=[it.role,it.name].filter(Boolean).join(" ");
+  return [it.bank,who].filter(Boolean).join(" · ");
+}
+
+function parseAccounts(html,key){
+  const region=extractRegion(html,key);
+  if(region===null) return null;
+  const doc=new DOMParser().parseFromString(`<ul>${region}</ul>`,"text/html");
+  return Array.from(doc.querySelectorAll("li.acc-item")).map(li=>({
+    role:(li.getAttribute("data-role")||"").trim(),
+    name:(li.getAttribute("data-name")||"").trim(),
+    bank:(li.getAttribute("data-bank")||"").trim(),
+    // 화면에 보이는 번호를 그대로 편집 대상으로 삼는다(data-account는 복사용 숫자라 표기와 다를 수 있음)
+    account:((li.querySelector(".acc-no")||{}).textContent||li.getAttribute("data-account")||"").trim(),
+  }));
+}
+
+function buildAccountsHtml(items){
+  if(!items.length) return "\n        ";
+  const rows=items.map(it=>{
+    const digits=it.account.replace(/[^0-9]/g,"");   // 복사 버튼은 숫자만 넘긴다
+    const role=it.role ? ` data-role="${escAttr(it.role)}"` : "";
+    return `          <li class="acc-item" data-account="${escAttr(digits)}" data-bank="${escAttr(it.bank)}" data-name="${escAttr(it.name)}"${role}>\n`
+         + `            <div class="acc-item__info"><span class="acc-bank">${escHtml(accLabel(it))}</span><span class="acc-no">${escHtml(it.account)}</span></div>\n`
+         + `            <button class="acc-copy" type="button">복사</button>\n`
+         + `          </li>`;
+  });
+  return "\n"+rows.join("\n")+"\n        ";
+}
+
+async function loadAccounts(){
+  $("#accHint").textContent="불러오는 중…"; $("#accSave").disabled=true;
+  try{
+    const f=await getFile("index.html");
+    accHtml=b64ToUtf8(f.base64); accSha=f.sha;
+    const missing=[];
+    ACC_GROUPS.forEach(g=>{
+      const items=parseAccounts(accHtml,g.key);
+      if(items===null){ missing.push(g.key); accData[g.key]=[]; return; }
+      accData[g.key]=items;
+    });
+    if(missing.length){
+      $("#accHint").textContent=`index.html에서 계좌 구역을 찾지 못했습니다: ${missing.join(", ")}`;
+      $("#accGroups").innerHTML=""; return;
+    }
+    $("#accHint").textContent="계좌를 추가·수정·삭제한 뒤 아래 저장을 누르세요.";
+    renderAccounts(); $("#accSave").disabled=false;
+  }catch(e){ $("#accHint").textContent="불러오기 실패: "+e.message; log(e.message,"err"); }
+}
+
+function renderAccounts(){
+  const box=$("#accGroups"); box.innerHTML="";
+  ACC_GROUPS.forEach(g=>{
+    const items=accData[g.key];
+    const grp=document.createElement("div"); grp.className="accgrp";
+    const h=document.createElement("h3"); h.textContent=g.label; grp.appendChild(h);
+
+    if(!items.length){
+      const p=document.createElement("p"); p.className="accempty";
+      p.textContent="등록된 계좌가 없습니다."; grp.appendChild(p);
+    }
+    items.forEach((it,i)=>grp.appendChild(accRow(g.key,it,i,items.length)));
+
+    const add=document.createElement("button");
+    add.className="ghost mini"; add.textContent="+ 계좌 추가";
+    add.onclick=()=>{ items.push({role:"",name:"",bank:"",account:""}); renderAccounts(); };
+    grp.appendChild(add);
+    box.appendChild(grp);
+  });
+}
+
+function accRow(gkey,it,i,total){
+  const row=document.createElement("div"); row.className="accrow";
+
+  const hd=document.createElement("div"); hd.className="accrow__hd";
+  const n=document.createElement("span"); n.className="accrow__n"; n.textContent=`${i+1}번째`;
+  const btns=document.createElement("div"); btns.className="accrow__btns";
+  const mk=(txt,fn,off)=>{ const b=document.createElement("button"); b.className="ghost mini"; b.textContent=txt; b.disabled=!!off; b.onclick=fn; return b; };
+  btns.appendChild(mk("↑",()=>moveAcc(gkey,i,-1),i===0));
+  btns.appendChild(mk("↓",()=>moveAcc(gkey,i,1),i===total-1));
+  btns.appendChild(mk("삭제",()=>{
+    const who=accLabel(it)||`${i+1}번째 계좌`;
+    if(!confirm(`"${who}" 계좌를 목록에서 지울까요?`)) return;
+    accData[gkey].splice(i,1); renderAccounts();
+  }));
+  hd.appendChild(n); hd.appendChild(btns); row.appendChild(hd);
+
+  const f=document.createElement("div"); f.className="accrow__f";
+  const prev=document.createElement("p"); prev.className="muted accrow__prev";
+  const field=(key,label,ph,extra)=>{
+    const wrap=document.createElement("div");
+    const lb=document.createElement("label"); lb.textContent=label;
+    const inp=document.createElement("input"); inp.type="text"; inp.value=it[key]; inp.placeholder=ph||"";
+    if(extra) inp.setAttribute("inputmode",extra);
+    inp.oninput=()=>{ it[key]=inp.value.trim(); drawPrev(); };
+    wrap.appendChild(lb); wrap.appendChild(inp); return wrap;
+  };
+  function drawPrev(){
+    const label=accLabel(it), no=it.account;
+    prev.innerHTML="";
+    prev.appendChild(document.createTextNode("청첩장 표시: "));
+    const b=document.createElement("b");
+    b.textContent=(label||no) ? `${label||"(은행·예금주 없음)"} / ${no||"(번호 없음)"}` : "(비어 있음)";
+    prev.appendChild(b);
+  }
+  f.appendChild(field("role","관계 (선택)","신랑 / 아버지"));
+  f.appendChild(field("name","예금주","박종현"));
+  f.appendChild(field("bank","은행","국민은행"));
+  f.appendChild(field("account","계좌번호","123456-78-901234","numeric"));
+  row.appendChild(f);
+  drawPrev(); row.appendChild(prev);
+  return row;
+}
+
+function moveAcc(gkey,i,d){
+  const a=accData[gkey], j=i+d;
+  if(j<0||j>=a.length) return;
+  [a[i],a[j]]=[a[j],a[i]];
+  renderAccounts();
+}
+
+async function saveAccounts(){
+  const btn=$("#accSave");
+  // 완전히 빈 줄은 그냥 버리고, 일부만 채운 줄은 실수일 가능성이 높으므로 막는다
+  for(const g of ACC_GROUPS){
+    accData[g.key]=accData[g.key].filter(it=>it.role||it.name||it.bank||it.account);
+    const bad=accData[g.key].find(it=>!it.name||!it.bank||!it.account);
+    if(bad){ log(`${g.label}: 예금주·은행·계좌번호를 모두 채워주세요`,"err"); renderAccounts(); return; }
+    const noDigit=accData[g.key].find(it=>!/[0-9]/.test(it.account));
+    if(noDigit){ log(`${g.label}: "${noDigit.name}"의 계좌번호에 숫자가 없습니다`,"err"); return; }
+  }
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span> 저장 중…';
+  try{
+    let out=accHtml;
+    ACC_GROUPS.forEach(g=>{ out=replaceRegion(out,g.key,buildAccountsHtml(accData[g.key])); });
+    if(out===accHtml){ log("변경 사항이 없습니다"); return; }
+    await putFile("index.html", utf8ToB64(out), "admin: 마음 전하실 곳 계좌 수정", accSha);
+    await refreshIndexPanels();
+    log("계좌 저장 완료 — 1~2분 뒤 반영","ok");
+  }catch(e){ log(e.message,"err"); }
+  finally{ btn.disabled=false; btn.textContent="계좌 저장(커밋)"; }
 }
 
 // ===== 콘텐츠 사진 =====
@@ -432,7 +619,7 @@ async function ogSaveThumb(){
     const sha=await getSha("assets/images/og.jpg");
     await putFile("assets/images/og.jpg", await blobToB64(blob), "admin: 공유 썸네일(OG) 교체", sha);
     const bumped = await bumpOgVersion();
-    await loadLocation(); // index.html이 바뀌었으니 '오시는 길' 편집기의 sha를 새로 받아둔다
+    await refreshIndexPanels(); // index.html이 바뀌었으니 다른 편집 패널의 sha를 새로 받아둔다
     $("#ogThumb").src="assets/images/og.jpg?t="+Date.now();
     $("#ogEditor").classList.add("hide"); ogImg=null; $("#ogFile").value="";
     log(bumped
@@ -551,6 +738,8 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeAdvLb(); });
 $("#connectBtn").onclick=connect;
 $("#locSave").onclick=saveLocation;
 $("#locReload").onclick=loadLocation;
+$("#accSave").onclick=saveAccounts;
+$("#accReload").onclick=loadAccounts;
 $("#galAddBtn").onclick=()=>$("#galAdd").click();
 $("#galSaveOrder").onclick=saveOrder;
 $("#galReloadBtn").onclick=loadGallery;
