@@ -177,18 +177,24 @@ function create_(body) {
   var message = clamp_(clean_(body.message, true), MAX_MESSAGE);
   var password = String(body.password == null ? "" : body.password);
 
-  if (!name) { return json_({ error: "이름을 입력해 주세요." }); }
+  // 이름과 비밀번호는 선택 사항이다. 청첩장 폼은 메시지만 받는다.
+  // (비밀번호를 받지 않으면 하객이 자기 글을 지울 수 없고, 시트에서 행을 지우면 된다)
   if (!message) { return json_({ error: "축하 메시지를 입력해 주세요." }); }
-  if (!/^\d{4}$/.test(password)) {
+  if (password && !/^\d{4}$/.test(password)) {
     return json_({ error: "비밀번호는 숫자 4자리로 입력해 주세요." });
   }
 
   var sh = sheet_();
   var all = rows_(sh);
 
-  // 전송 버튼 중복 클릭 방지
+  // 전송 버튼 중복 클릭 방지 — 1분 안에 똑같은 글이 또 오면 막는다.
+  // (이름을 받지 않으므로 서로 다른 하객이 같은 문구를 쓰는 것은 막지 않는다)
+  var cutoff = Date.now() - 60 * 1000;
   var dup = all.some(function (r) {
-    return String(r[COL.NAME - 1]) === name && String(r[COL.MESSAGE - 1]) === message;
+    if (String(r[COL.MESSAGE - 1]) !== message) { return false; }
+    if (String(r[COL.NAME - 1]) !== name) { return false; }
+    var t = Date.parse(isoOf_(r[COL.CREATED - 1]));
+    return isNaN(t) ? false : t >= cutoff;
   });
   if (dup) { return json_({ error: "이미 등록된 메시지입니다." }); }
 
@@ -203,7 +209,7 @@ function create_(body) {
     message: message
   };
 
-  sh.appendRow([item.id, item.createdAt, item.name, item.message, makePwHash_(password)]);
+  sh.appendRow([item.id, item.createdAt, item.name, item.message, password ? makePwHash_(password) : ""]);
   return json_({ item: item });
 }
 
@@ -215,7 +221,11 @@ function remove_(body) {
   var all = rows_(sh);
   for (var i = 0; i < all.length; i++) {
     if (String(all[i][COL.ID - 1]) !== id) { continue; }
-    if (!checkPw_(password, all[i][COL.PWHASH - 1])) {
+    var stored = String(all[i][COL.PWHASH - 1] || "");
+    if (!stored) {
+      return json_({ error: "이 메시지는 삭제할 수 없습니다." });
+    }
+    if (!checkPw_(password, stored)) {
       return json_({ error: "비밀번호가 일치하지 않습니다." });
     }
     sh.deleteRow(i + 2); // +2 = 머리글 1행 + 0-based 보정

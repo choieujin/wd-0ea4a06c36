@@ -209,9 +209,12 @@ async function handleCreate(req, res) {
   const message = clamp(clean(body.message, { multiline: true }), MAX_MESSAGE);
   const password = String(body.password == null ? "" : body.password);
 
-  if (!name) return sendJson(res, 400, { error: "이름을 입력해 주세요." });
+  // 이름·비밀번호는 선택 사항 (청첩장 폼은 메시지만 받는다).
+  // 비밀번호를 받지 않으면 작성자가 자기 글을 지울 수 없다.
   if (!message) return sendJson(res, 400, { error: "축하 메시지를 입력해 주세요." });
-  if (!/^\d{4}$/.test(password)) return sendJson(res, 400, { error: "비밀번호는 숫자 4자리로 입력해 주세요." });
+  if (password && !/^\d{4}$/.test(password)) {
+    return sendJson(res, 400, { error: "비밀번호는 숫자 4자리로 입력해 주세요." });
+  }
 
   const ip = clientIp(req);
   const now = Date.now();
@@ -231,7 +234,7 @@ async function handleCreate(req, res) {
       createdAt: new Date().toISOString(),
     };
     list.messages.push(item);
-    auth[item.id] = hashPassword(password);
+    if (password) auth[item.id] = hashPassword(password);
     return { dirty: true, item: item };
   });
 
@@ -248,6 +251,8 @@ async function handleDelete(req, res, id) {
   const result = await mutate((list, auth) => {
     const idx = list.messages.findIndex((m) => String(m.id) === id);
     if (idx === -1) return { dirty: false, notFound: true };
+    // 비밀번호 없이 올라온 글은 작성자가 지울 수 없다 (관리자 키로만 가능)
+    if (!isAdmin && !auth[id]) return { dirty: false, noPassword: true };
     if (!isAdmin && !verifyPassword(password, auth[id])) return { dirty: false, denied: true };
     list.messages.splice(idx, 1);
     delete auth[id];
@@ -255,6 +260,7 @@ async function handleDelete(req, res, id) {
   });
 
   if (result.notFound) return sendJson(res, 404, { error: "메시지를 찾을 수 없습니다." });
+  if (result.noPassword) return sendJson(res, 403, { error: "이 메시지는 삭제할 수 없습니다." });
   if (result.denied) return sendJson(res, 403, { error: "비밀번호가 일치하지 않습니다." });
   sendJson(res, 200, { ok: true });
 }
