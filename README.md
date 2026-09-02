@@ -49,8 +49,8 @@ node server.mjs
 # 브라우저에서 http://localhost:8765 접속
 ```
 
-축하 메시지까지 실제로 남겨보려면 `server.mjs` 로 띄워야 합니다.
-화면만 확인할 거라면 `python3 -m http.server 8765` 도 됩니다(이때 방명록은 읽기 전용).
+`python3 -m http.server 8765` 로 띄워도 됩니다. 축하 메시지는 구글 폼·시트로 동작하므로
+어느 쪽으로 띄우든 똑같이 읽고 쓸 수 있습니다.
 
 ---
 
@@ -65,9 +65,10 @@ node server.mjs
 │   ├── js/
 │   │   ├── main.js           # 캘린더·갤러리·계좌복사·D-day 동작
 │   │   ├── guestbook.js      # 축하 메시지(방명록) 동작
+│   │   ├── guestbook-config.js # 구글 폼·시트 주소 (여기만 채우면 됨)
 │   │   └── gallery-list.js   # 갤러리 사진 목록 (자동 생성)
 │   ├── data/
-│   │   └── guestbook.json    # 축하 메시지 저장 파일 (DB 대신)
+│   │   └── guestbook.json    # 로컬 서버로 받을 때의 저장 파일
 │   ├── gallery/              # 갤러리 사진 원본 (여기에 사진 넣기)
 │   └── images/
 │       ├── main.jpg          # 표지 대표 사진
@@ -81,57 +82,71 @@ node server.mjs
 
 ## 축하 메시지 (방명록)
 
-갤러리 아래에 하객이 축하 메시지를 남기는 섹션이 있습니다. **DB 없이 JSON 파일**에 저장합니다.
+갤러리 아래에 하객이 축하 메시지를 남기는 섹션이 있습니다. **DB는 쓰지 않습니다.**
 
-| | |
-|---|---|
-| 저장 파일 | `assets/data/guestbook.json` (공개 · 그대로 커밋해도 되는 파일) |
-| 비밀번호 해시 | `data/guestbook-auth.json` (서버 전용 · `.gitignore` 처리됨) |
-| 쓰기 | `server.mjs` 의 `POST /api/guestbook` |
-| 읽기 | API가 있으면 API, 없으면 JSON 파일을 직접 읽음 |
+```
+하객이 작성  →  구글 폼으로 전송  →  구글 시트에 한 줄씩 쌓임
+                                        ↓
+                       청첩장 화면이 그 시트를 읽어서 표시
+```
 
-### 두 가지 모드
+GitHub Pages 는 정적 호스팅이라 글을 받아줄 서버가 없는데, 구글 폼이 그 역할을 대신합니다.
+서버를 띄울 필요도, Apps Script 를 배포할 필요도 없습니다.
 
-**1) 서버를 띄운 경우 — 읽기 + 쓰기**
+### 설정 (한 번만, 5분)
+
+`assets/js/guestbook-config.js` 한 파일만 채우면 됩니다. 그 파일 맨 위에도 같은 설명이 있습니다.
+
+1. **구글 폼을 만든다** — 질문 2개, 순서대로
+   - `이름` : 단답형
+   - `축하 메시지` : 장문형
+
+   로그인 요구·이메일 수집은 모두 꺼 둡니다. (하객이 로그인 없이 써야 합니다)
+
+2. **폼 → [응답] 탭 → 스프레드시트 아이콘 → "기존 스프레드시트 선택"** 에서 쓰던 시트를 지정합니다.
+   이제 응답이 그 시트에 쌓입니다.
+
+3. **시트 [공유] → "링크가 있는 모든 사용자" → 뷰어** 로 바꿉니다. (읽기용)
+
+4. `guestbook-config.js` 에 아래 세 가지를 적습니다.
+
+   | 항목 | 어디서 얻나 |
+   |---|---|
+   | `formAction` | 폼 [보내기] → 링크 주소에서 끝의 `/viewform` 을 `/formResponse` 로 바꾼 것 |
+   | `fields.name`, `fields.message` | 폼 우측 상단 ⋮ → **미리 채워진 링크 가져오기** → 아무 값이나 넣고 링크 복사 → 주소 안의 `entry.숫자` 두 개 |
+   | `sheetId` | 시트 주소의 `/d/` 와 `/edit` 사이 문자열 |
+
+설정을 비워두면 방명록은 **읽기 전용**으로 표시됩니다(입력 폼이 숨겨짐). 사이트는 정상 동작합니다.
+
+### 알아둘 점
+
+- **다른 사람 화면에 뜨기까지 최대 1~5분** 걸릴 수 있습니다(구글 시트 읽기 캐시).
+  글을 쓴 본인 화면에는 곧바로 "방금 전 · 곧 반영됩니다" 로 표시되고, 시트에 올라오면 자동으로 교체됩니다.
+- **하객이 자기 글을 지울 수는 없습니다.** 지울 일이 있으면 **시트에서 해당 행을 삭제**하면 됩니다.
+- 목록이 안 읽히면 `csvUrl` 을 쓰세요. 시트 [파일] → [공유] → [웹에 게시] → 형식 `.csv` → 게시 후
+  나온 주소를 `guestbook-config.js` 의 `csvUrl` 에 넣으면 그쪽을 우선 사용합니다.
+- 폼 응답 주소는 공개돼 있어 이론상 장난 글이 올 수 있습니다. 결혼식 전후로 시트를 한 번씩 봐주세요.
+
+### 로컬에서 서버로 받고 싶다면 (선택)
+
+구글을 쓰지 않고 파일에 직접 저장하는 방식도 그대로 남아 있습니다.
+`guestbook-config.js` 를 비워둔 채 아래처럼 띄우면 `assets/data/guestbook.json` 에 저장되고,
+이때는 하객이 **비밀번호 4자리로 본인 글을 삭제**할 수도 있습니다.
 
 ```bash
 node server.mjs            # http://localhost:8765
 PORT=3000 node server.mjs  # 포트 변경
+GUESTBOOK_ADMIN_KEY=원하는키 node server.mjs   # 관리자 삭제용 키
 ```
-
-하객이 남긴 메시지는 곧바로 `assets/data/guestbook.json` 에 기록됩니다.
-
-**2) GitHub Pages 처럼 정적으로만 배포한 경우 — 읽기 전용**
-
-Pages 에는 API가 없으므로 `/api/guestbook` 요청이 404가 되고, `guestbook.js` 가 자동으로
-읽기 전용으로 전환합니다. 입력 폼이 숨겨지고 "메시지 열람만 가능합니다" 안내가 뜹니다.
-**즉, Pages 주소만으로는 하객이 메시지를 남길 수 없습니다.** 남기게 하려면 둘 중 하나가 필요합니다.
-
-- `server.mjs` 를 어딘가(집 PC + 터널, Render, Fly.io 등)에 띄우고,
-  `index.html` 의 방명록 섹션에 API 주소를 적어줍니다.
-  ```html
-  <section class="guestbook ..." id="guestbook" data-api="https://내주소/api/guestbook">
-  ```
-  (서버가 CORS 를 허용하므로 다른 도메인에 올려도 동작합니다.)
-- 또는 서버를 잠깐 로컬에서 돌려 메시지를 받은 뒤,
-  갱신된 `assets/data/guestbook.json` 을 커밋·푸시해 Pages 에 반영합니다.
-  이 경우 Pages 방문자는 메시지를 **읽기만** 합니다.
-
-### 메시지 삭제
-
-- 작성자: 글 쓸 때 정한 숫자 4자리 비밀번호로 본인 글 삭제 (`삭제` 버튼)
-- 관리자: 서버를 `GUESTBOOK_ADMIN_KEY=원하는키 node server.mjs` 로 띄우면
-  그 키를 비밀번호 자리에 넣어 아무 글이나 삭제할 수 있습니다.
-- 손으로 지워도 됩니다 — `assets/data/guestbook.json` 에서 해당 항목을 지우면 끝입니다.
 
 ### 한글·이모지가 깨지지 않게 하는 규칙
 
-수정할 일이 있다면 아래를 유지해 주세요. (자세한 이유는 `server.mjs` 상단 주석)
+수정할 일이 있다면 아래를 유지해 주세요.
 
-- 요청 본문은 청크를 다 모은 뒤 **한 번에** UTF-8 디코딩 (중간에 자르면 한글이 깨짐)
-- 파일 읽기/쓰기 시 `"utf8"` 명시, 응답 헤더에 `charset=utf-8` 명시
-- 저장 전 `normalize("NFC")` — iOS/macOS 에서 오는 자모 분리 한글을 합침
-- 글자 수 제한은 `length` 가 아니라 **코드포인트**(`Array.from`) 기준 — 이모지가 반쪽으로 잘리지 않음
+- 폼 전송은 `URLSearchParams`(UTF-8 폼 인코딩)로 보냅니다.
+- 글자 수 제한은 `String.length` 가 아니라 **코드포인트**(`Array.from`) 기준 — 이모지가 반쪽으로 잘리지 않습니다.
+- 서버(`server.mjs`)를 고칠 때는 파일 상단 주석의 5가지 규칙을 지켜 주세요.
+  (본문 한 번에 UTF-8 디코딩 · 파일 IO `utf8` 명시 · 응답 `charset=utf-8` · 저장 전 NFC 정규화 · 코드포인트 기준 길이)
 
 ---
 
@@ -144,7 +159,8 @@ Pages 에는 API가 없으므로 `/api/guestbook` 요청이 404가 되고, `gues
 | 계좌번호 | `index.html` — `.acc-item`의 `data-account` |
 | 교통·주차 안내 | `index.html` — `.location` 의 `.info-block` |
 | 지도 검색어 | `main.js` — `PLACE_QUERY` |
-| 축하 메시지 문구·이모지 목록 | `assets/js/guestbook.js` — `EMOJIS`, `MAX_MESSAGE` |
+| 축하 메시지 — 구글 폼·시트 주소 | `assets/js/guestbook-config.js` |
+| 축하 메시지 — 이모지 목록·글자수 제한 | `assets/js/guestbook.js` — `EMOJIS`, `MAX_MESSAGE` |
 | 표지/색상 톤 | `assets/css/style.css` — `:root` 변수 |
 
 ---

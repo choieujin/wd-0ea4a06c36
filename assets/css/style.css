@@ -720,6 +720,8 @@ section.paper + section.paper::after {
 }
 .gb-form[hidden] { display: none; }
 .gb-form__row { display: flex; gap: 8px; }
+/* 구글 폼 방식은 삭제 비밀번호를 받지 않아 이름 칸만 남는다 */
+.gb-form__row--single .gb-input { width: 100%; }
 
 .gb-input, .gb-textarea {
   font-family: var(--sans); font-size: 0.95rem; color: var(--ink);
@@ -784,6 +786,9 @@ section.paper + section.paper::after {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.045);
 }
 .gb-item:nth-child(odd) { background: #fffdf7; }
+/* 방금 보냈지만 아직 시트에 반영되기 전인 내 글 */
+.gb-item.is-pending { border-style: dashed; border-color: var(--pink-soft); }
+.gb-item.is-pending .gb-item__date { color: var(--pink); }
 .gb-item__head { display: flex; align-items: baseline; gap: 8px; padding-right: 38px; }
 .gb-item__name { font-family: var(--hand); font-size: 0.98rem; color: var(--ink); font-weight: 700; }
 .gb-item__date { font-size: 0.72rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
