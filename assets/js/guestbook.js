@@ -29,6 +29,17 @@
   var MAX_MESSAGE = 300;
   var PAGE_SIZE = 5;
 
+  /**
+   * 이름·비밀번호 칸이 없을 때 서버로 대신 보낼 값.
+   *
+   * 시트에 붙여둔 스크립트가 예전 버전이면 이름·비밀번호를 "필수"로 검사한다.
+   * 빈 값을 보내면 "이름을 입력해 주세요" 로 거부되므로, 통과할 수 있는 값을 채워 보낸다.
+   * 이 이름은 화면에 표시하지 않는다(익명 취급). 비밀번호는 아무도 모르는 난수라
+   * 사실상 본인 삭제가 불가한 것과 같다 — 삭제는 시트에서 행을 지우면 된다.
+   */
+  var ANON_NAME = "하객";
+  function randomPin() { return String(Math.floor(1000 + Math.random() * 9000)); }
+
   /* 보낸 글을 내 화면에 붙여두는 시간 — 시트에 반영되기까지의 지연을 가린다 */
   var PENDING_KEY = "guestbook:pending";
   var PENDING_TTL_MS = 6 * 60 * 60 * 1000;
@@ -442,7 +453,7 @@
     head.className = "gb-item__head";
 
     // 이름은 받지 않지만, 예전에 이름과 함께 올라온 글은 그대로 보여준다
-    if (item.name) {
+    if (item.name && item.name !== ANON_NAME) {
       var name = document.createElement("span");
       name.className = "gb-item__name";
       name.textContent = item.name; // textContent — 태그가 그대로 글자로 보인다(XSS 방지)
@@ -587,9 +598,9 @@
     e.preventDefault();
     if (state.sending) { return; }
 
-    var name = el.name ? el.name.value.trim() : "";
+    var name = el.name ? el.name.value.trim() : ANON_NAME;
     var message = el.message.value.trim();
-    var password = el.password ? el.password.value.trim() : "";
+    var password = el.password ? el.password.value.trim() : randomPin();
 
     if (el.name && !name) { toast("이름을 입력해 주세요."); el.name.focus(); return; }
     if (!message) { toast("축하 메시지를 입력해 주세요."); el.message.focus(); return; }
