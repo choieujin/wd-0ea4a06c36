@@ -184,7 +184,7 @@
       if (!name && !message) { continue; }
       items.push({
         id: "r" + i,
-        name: name || "익명",
+        name: name,   // 비어 있으면 카드에 이름 줄을 그리지 않는다
         message: message,
         createdAt: r[idx.createdAt]
       });
@@ -413,7 +413,7 @@
 
   /* ---------- 상태 ---------- */
 
-  var state = { backend: StaticFile, items: [], shown: 0, sending: false };
+  var state = { backend: StaticFile, canDelete: false, items: [], shown: 0, sending: false };
   var el = {};
 
   /* ---------- 렌더 ---------- */
@@ -441,15 +441,17 @@
     var head = document.createElement("div");
     head.className = "gb-item__head";
 
-    var name = document.createElement("span");
-    name.className = "gb-item__name";
-    name.textContent = item.name; // textContent — 태그가 그대로 글자로 보인다(XSS 방지)
+    // 이름은 받지 않지만, 예전에 이름과 함께 올라온 글은 그대로 보여준다
+    if (item.name) {
+      var name = document.createElement("span");
+      name.className = "gb-item__name";
+      name.textContent = item.name; // textContent — 태그가 그대로 글자로 보인다(XSS 방지)
+      head.appendChild(name);
+    }
 
     var date = document.createElement("span");
     date.className = "gb-item__date";
     date.textContent = item.pending ? "방금 전 · 곧 반영됩니다" : formatDate(item.createdAt);
-
-    head.appendChild(name);
     head.appendChild(date);
 
     var body = document.createElement("p");
@@ -459,7 +461,7 @@
     li.appendChild(head);
     li.appendChild(body);
 
-    if (state.backend.canDelete && !item.pending) {
+    if (state.canDelete && !item.pending) {
       var del = document.createElement("button");
       del.type = "button";
       del.className = "gb-item__del";
@@ -585,13 +587,13 @@
     e.preventDefault();
     if (state.sending) { return; }
 
-    var name = el.name.value.trim();
+    var name = el.name ? el.name.value.trim() : "";
     var message = el.message.value.trim();
-    var password = el.password.value.trim();
+    var password = el.password ? el.password.value.trim() : "";
 
-    if (!name) { toast("이름을 입력해 주세요."); el.name.focus(); return; }
+    if (el.name && !name) { toast("이름을 입력해 주세요."); el.name.focus(); return; }
     if (!message) { toast("축하 메시지를 입력해 주세요."); el.message.focus(); return; }
-    if (state.backend.canDelete && !/^\d{4}$/.test(password)) {
+    if (el.password && !/^\d{4}$/.test(password)) {
       toast("비밀번호는 숫자 4자리로 입력해 주세요.");
       el.password.focus();
       return;
@@ -606,7 +608,7 @@
         state.items.unshift(item);
         renderList(true);
         el.message.value = "";
-        el.password.value = "";
+        if (el.password) { el.password.value = ""; }
         el.emojiPad.hidden = true;
         el.emojiBtn.setAttribute("aria-expanded", "false");
         el.emojiBtn.classList.remove("is-open");
@@ -635,15 +637,13 @@
     }
     el.notice.hidden = true;
 
-    // 삭제를 못 하는 방식이면 비밀번호를 받을 이유가 없다
-    var pwWrap = el.password.parentNode;
-    el.password.hidden = !b.canDelete;
-    if (!b.canDelete) {
-      el.password.removeAttribute("name");
-      if (pwWrap) { pwWrap.classList.add("gb-form__row--single"); }
-      el.hint.textContent = "남겨주신 메시지는 신랑·신부에게 그대로 전달됩니다.";
-    } else {
-      el.hint.textContent = "비밀번호는 내가 쓴 메시지를 지울 때 사용합니다.";
+    // 삭제는 비밀번호를 받을 때만 가능하다. 지금 폼은 비밀번호를 받지 않으므로
+    // 하객이 직접 지울 수 없고, 신랑·신부가 시트에서 행을 지우면 된다.
+    state.canDelete = b.canDelete && Boolean(el.password);
+    if (el.hint) {
+      el.hint.textContent = state.canDelete
+        ? "비밀번호는 내가 쓴 메시지를 지울 때 사용합니다."
+        : "남겨주신 메시지는 신랑·신부에게 그대로 전달됩니다.";
     }
   }
 
@@ -678,7 +678,7 @@
     el.hint = $("gbHint");
 
     buildEmojiPad();
-    limitInput(el.name, MAX_NAME);
+    if (el.name) { limitInput(el.name, MAX_NAME); }
     limitInput(el.message, MAX_MESSAGE);
     updateCounter();
 

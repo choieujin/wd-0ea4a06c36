@@ -720,8 +720,6 @@ section.paper + section.paper::after {
 }
 .gb-form[hidden] { display: none; }
 .gb-form__row { display: flex; gap: 8px; }
-/* 구글 폼 방식은 삭제 비밀번호를 받지 않아 이름 칸만 남는다 */
-.gb-form__row--single .gb-input { width: 100%; }
 
 .gb-input, .gb-textarea {
   font-family: var(--sans); font-size: 0.95rem; color: var(--ink);
