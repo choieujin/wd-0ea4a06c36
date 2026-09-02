@@ -14,7 +14,15 @@
 ## 메모
 
 - 모바일 우선(mobile-first) 반응형 설계.
-- 기술 스택 미정 — 정해지면 이 문서에 기록.
+- 기술 스택: 순수 HTML/CSS/JS 정적 사이트(GitHub Pages 배포) + 축하 메시지용 Node 서버(`server.mjs`, 외부 패키지 없음).
+
+## 축하 메시지(방명록)
+
+- DB를 쓰지 않는다. 저장은 파일: 공개 목록 `assets/data/guestbook.json`, 비밀번호 해시 `data/guestbook-auth.json`(git 제외).
+- 쓰기는 `server.mjs` 의 `/api/guestbook`, 정적 배포(GitHub Pages)에서는 API가 없으므로 `guestbook.js` 가 자동으로 읽기 전용으로 전환한다.
+- **한글·이모지 깨짐 방지 규칙**(수정 시 반드시 유지, 이유는 `server.mjs` 상단 주석 참고):
+  요청 본문은 청크를 다 모은 뒤 한 번에 UTF-8 디코딩 · 파일 IO에 `"utf8"` 명시 · 응답에 `charset=utf-8` ·
+  저장 전 `normalize("NFC")` · 길이 제한은 `length` 가 아니라 코드포인트(`Array.from`) 기준.
 
 ## 참고 지식: 주차장 데이터 출처
 
