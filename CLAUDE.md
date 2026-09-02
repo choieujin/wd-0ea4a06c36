@@ -18,9 +18,12 @@
 
 ## 축하 메시지(방명록)
 
-- DB를 쓰지 않는다. **기본은 구글 폼(쓰기) + 구글 시트(읽기)** — GitHub Pages 에 서버가 없어서 폼이 그 역할을 한다.
-- 설정은 `assets/js/guestbook-config.js` 한 파일(폼 주소·entry ID·시트 ID). 비어 있으면 자동으로 읽기 전용.
-- `guestbook.js` 는 백엔드를 세 가지 중에서 고른다: `form`(구글) → `server`(`server.mjs` 의 `/api/guestbook`, 파일 저장) → `file`(`assets/data/guestbook.json` 읽기 전용).
+- DB를 쓰지 않는다. 저장소는 구글 시트이고, GitHub Pages 에 서버가 없어서 글을 받는 창구만 구글 쪽에 둔다.
+- 설정은 `assets/js/guestbook-config.js` 한 파일. 비어 있으면 자동으로 읽기 전용.
+- `guestbook.js` 는 백엔드를 네 가지 중에서 고른다:
+  `script`(시트에 붙인 Apps Script 웹 앱, `apps-script/Code.gs` · **권장**) → `form`(구글 폼) →
+  `server`(`server.mjs` 의 `/api/guestbook`, 파일 저장) → `file`(`assets/data/guestbook.json` 읽기 전용).
+- Apps Script 로 POST 할 때는 CORS preflight 를 피하려고 `text/plain;charset=utf-8` 로 보낸다(본문은 JSON 문자열). 스크립트를 고치면 **새 버전으로 재배포**해야 반영된다.
 - 구글 폼 방식의 제약: 전송 응답을 읽을 수 없어(no-cors) 보낸 글은 localStorage 에 잠시 넣어 화면에 먼저 띄우고 시트에 올라오면 교체한다. 하객 본인 삭제는 불가(시트에서 행 삭제).
 - **한글·이모지 깨짐 방지 규칙**(수정 시 반드시 유지, 이유는 `server.mjs` 상단 주석 참고):
   요청 본문은 청크를 다 모은 뒤 한 번에 UTF-8 디코딩 · 파일 IO에 `"utf8"` 명시 · 응답에 `charset=utf-8` ·
