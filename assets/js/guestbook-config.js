@@ -20,7 +20,7 @@
 window.GUESTBOOK = {
 
   /* ⓐ Apps Script 웹 앱 주소 — 이거 하나만 채우면 끝 */
-  webAppUrl: "https://script.google.com/macros/s/AKfycbxpGNamogyL-EqPKiT701kmW921VbXqEQFPpwz0gWS9OLe6qRMC9A3bUfpKNEWPLxqn/exec",
+  webAppUrl: "https://script.google.com/macros/s/AKfycbymsw_ZPT-FxTBOnUTDqoQ3P-wiUBRgK4BeXFDQ6dR8PVjVFesQM69rDYNdjKxc-Y8r/exec",
 
   /* ───────────────────────────────────────────────────────────────────
      ⓑ 구글 폼 방식 (ⓐ 를 쓰면 아래는 전부 비워두면 된다)
