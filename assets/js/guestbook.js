@@ -1,14 +1,15 @@
 /**
  * 축하 메시지(방명록)
  *
- * 저장소는 DB가 아니다. 상황에 따라 아래 셋 중 하나를 자동으로 고른다.
+ * 저장소는 DB가 아니다. 설정(guestbook-config.js)을 보고 아래 넷 중 하나를 고른다.
  *
- *  1) form  — 구글 폼으로 쓰고, 연결된 구글 시트에서 읽는다. (GitHub Pages 용 · 기본)
- *             assets/js/guestbook-config.js 에 폼 주소가 채워져 있으면 이 방식.
- *  2) server — server.mjs 의 /api/guestbook. 로컬에서 돌릴 때 쓴다. 본인 글 삭제 가능.
- *  3) file  — 위 둘 다 없으면 assets/data/guestbook.json 을 읽어 "읽기 전용"으로 보여준다.
+ *  1) script — 구글 시트에 붙인 Apps Script 웹 앱. 읽기·쓰기·삭제를 한 주소에서 처리.
+ *              webAppUrl 이 채워져 있으면 이 방식. (권장)
+ *  2) form   — 구글 폼으로 쓰고, 연결된 구글 시트에서 읽는다.
+ *  3) server — server.mjs 의 /api/guestbook. 로컬에서 돌릴 때 쓴다.
+ *  4) file   — 아무 설정도 없으면 assets/data/guestbook.json 을 읽어 "읽기 전용".
  *
- * 구글 폼 방식의 한계(설계상 어쩔 수 없는 것):
+ * 구글 폼(2번) 방식의 한계:
  *  - 전송 결과를 읽을 수 없다(브라우저가 응답을 막는다). 그래서 보낸 글은 내 화면에
  *    먼저 붙여두고(localStorage), 시트에서 같은 글이 올라오면 그걸로 교체한다.
  *  - 하객이 자기 글을 지울 수 없다. 삭제는 신랑신부가 시트에서 행을 지우면 된다.
@@ -110,7 +111,10 @@
           throw err;
         }
         if (!data) { throw new Error("응답을 읽지 못했습니다."); }
-        if (data.error) { throw new Error(data.error); }
+        if (data.error) {
+          // 서버가 이유를 알려준 거절 — 그대로 사용자에게 보여준다
+          throw Object.assign(new Error(data.error), { fromServer: true });
+        }
         return data;
       });
     });
@@ -229,6 +233,65 @@
   }
 
   /* ---------- 백엔드 ---------- */
+
+  /**
+   * 0) 구글 시트에 붙인 Apps Script 웹 앱 (권장)
+   *    읽기·쓰기·삭제를 한 주소에서 다 처리한다.
+   */
+  var WebApp = {
+    name: "script",
+    canWrite: true,
+    canDelete: true,
+
+    list: function () {
+      return fetchJson(CFG.webAppUrl, { credentials: "omit" })
+        .then(function (data) { return mergePending(data.items || []); })
+        .catch(function (err) {
+          var mine = mergePending([]);
+          if (mine.length) { return mine; } // 못 읽어도 내가 쓴 글은 보여준다
+          throw err;
+        });
+    },
+
+    /** preflight 를 피하려고 text/plain 으로 보낸다. 내용은 JSON 문자열. */
+    post: function (payload) {
+      return fetchJson(CFG.webAppUrl, {
+        method: "POST",
+        credentials: "omit",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+    },
+
+    create: function (payload) {
+      var optimistic = {
+        id: "p" + Date.now(),
+        name: payload.name,
+        message: payload.message,
+        createdAt: new Date().toISOString(),
+        pending: true
+      };
+      return this.post({
+        action: "create",
+        name: payload.name,
+        message: payload.message,
+        password: payload.password
+      }).then(function (data) {
+        return data.item || optimistic;
+      }).catch(function (err) {
+        // 스크립트가 돌려준 거절 사유는 그대로 알린다
+        if (err.fromServer) { throw err; }
+        // 응답을 못 읽은 경우(네트워크·CORS) — 글은 들어갔을 가능성이 높다.
+        // 화면에 먼저 띄워두고 다음 조회 때 시트 글로 교체한다.
+        addPending(optimistic);
+        return optimistic;
+      });
+    },
+
+    remove: function (id, password) {
+      return this.post({ action: "delete", id: id, password: password });
+    }
+  };
 
   /** 1) 구글 폼(쓰기) + 구글 시트(읽기) */
   var FormSheet = {
@@ -586,8 +649,9 @@
 
   /* ---------- 초기화 ---------- */
 
-  /** 폼 설정이 있으면 form, 없으면 server(API 응답 확인), 그것도 없으면 file */
+  /** 스크립트 주소 → 폼 설정 → 로컬 API → 읽기 전용 파일 순으로 고른다 */
   function pickBackend() {
+    if (CFG.webAppUrl) { return Promise.resolve(WebApp); }
     if (hasFormConfig()) { return Promise.resolve(FormSheet); }
     return ServerApi.list()
       .then(function () { return ServerApi; })
