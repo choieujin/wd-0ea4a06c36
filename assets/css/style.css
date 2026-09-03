@@ -965,8 +965,14 @@ section.paper + section.paper::after {
 .dark .gb-confirm { border-top-color: rgba(255, 255, 255, 0.22); }
 .dark .gb-confirm__cancel { background: rgba(255, 255, 255, 0.14); color: #f7f4ec; }
 
-.dark .gb-more { color: #f7f4ec; border-color: rgba(255, 255, 255, 0.3); }
-.dark .gb-more:active { background: rgba(255, 255, 255, 0.14); }
+/* 더보기: 검정 위에서 테두리만으로는 눈에 띄지 않아 면을 채운다 */
+.dark .gb-more {
+  margin-top: 14px; color: #fff; font-weight: 600;
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.5);
+  padding: 9px 24px;
+}
+.dark .gb-more:active { background: rgba(255, 255, 255, 0.26); }
 
 /* ===== Footer (검정 구겨진 종이) ===== */
 .footer {
