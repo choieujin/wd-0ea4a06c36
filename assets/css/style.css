@@ -546,6 +546,48 @@ section.paper + section.paper::after {
 }
 .calendar__dday { margin-top: 26px; font-family: var(--hand); color: var(--pink); font-size: 1.0rem; }
 
+/* ===== Save the Date — 하트 안에 담은 달력 =====
+   종이 위에 장미빛 하트를 오려 붙이고 그 안에 달력을 앉힌다.
+   예식일 칸만 하늘색 하트로 짚어 준다(표지 구슬의 하늘색과 맞춘 색). */
+.datecal { padding: 70px 12px 86px; }
+.datecal__when {
+  margin-top: 2px; font-size: 0.9rem; letter-spacing: 0.02em; color: var(--ink-soft);
+}
+/* 하트는 배경 레이어(::before)로 깐다 — 하트에 clip-path 를 주고 달력을 자식으로 넣으면
+   날짜 칸이 하트 밖으로 잘려 나간다. 위/아래 padding 이 달력을 하트의 넓은 허리에 앉힌다. */
+.datecal__heart {
+  position: relative;
+  width: 100%; max-width: 360px;
+  margin: 22px auto 0;
+  padding: 34% 0 32%;
+}
+.datecal__heart::before {
+  content: "";
+  position: absolute; inset: 0; z-index: 0;
+  background: var(--rose-soft);
+  /* 손으로 오린 듯 좌우가 살짝 다른 하트 */
+  /* 곡선 하트 — 각지지 않게 다듬되 아래쪽 폭을 넓게 남겨 달력이 들어가도록 */
+  clip-path: polygon(50.0% 100.0%, 47.6% 98.4%, 42.9% 95.1%, 35.8% 90.2%, 26.2% 83.8%, 18.5% 77.7%, 12.5% 72.1%, 8.2% 66.9%, 5.8% 62.1%, 3.8% 57.4%, 2.2% 52.6%, 1.2% 47.9%, 0.8% 43.1%, 0.9% 38.3%, 1.6% 33.4%, 3.0% 28.5%, 5.0% 23.5%, 7.6% 19.3%, 10.9% 15.9%, 14.8% 13.4%, 19.2% 11.6%, 23.6% 10.6%, 27.9% 10.4%, 32.0% 10.9%, 36.0% 12.1%, 39.5% 13.7%, 42.5% 15.6%, 45.0% 17.8%, 47.0% 20.2%, 48.5% 22.1%, 49.5% 23.4%, 50.0% 24.0%, 50.5% 23.4%, 51.5% 22.1%, 53.0% 20.2%, 55.0% 17.8%, 57.5% 15.6%, 60.5% 13.7%, 64.0% 12.1%, 68.0% 10.9%, 72.1% 10.4%, 76.4% 10.6%, 80.8% 11.6%, 85.2% 13.4%, 89.1% 15.9%, 92.4% 19.3%, 95.0% 23.5%, 97.0% 28.5%, 98.4% 33.4%, 99.1% 38.3%, 99.2% 43.1%, 98.8% 47.9%, 97.8% 52.6%, 96.2% 57.4%, 94.2% 62.1%, 91.8% 66.9%, 87.5% 72.1%, 81.5% 77.7%, 73.8% 83.8%, 64.2% 90.2%, 57.1% 95.1%, 52.4% 98.4%);
+  filter: drop-shadow(0 6px 12px rgba(96, 70, 32, 0.22));
+}
+.datecal__heart .calendar__grid {
+  position: relative; z-index: 1;
+  width: 68%; max-width: 244px;
+  font-size: 0.74rem;
+}
+/* 하트 위에 얹히는 글씨는 종이 잉크색으로 (하트가 밝은 장미빛이라 대비가 난다) */
+.datecal .calendar__grid .cal-head { color: #7c3b4b; font-size: 0.66rem; letter-spacing: 0.05em; padding-bottom: 6px; }
+.datecal .calendar__grid .cal-head.sun { color: #9d4257; }
+.datecal .calendar__grid .cal-cell { color: #40261f; padding: 4px 0; }
+.datecal .calendar__grid .cal-cell.empty { color: transparent; }
+.datecal .calendar__grid .cal-cell.sun { color: #8f3a4c; }
+.datecal .calendar__grid .cal-cell.is-wedding { color: #24313d; font-weight: 800; }
+.datecal .calendar__grid .cal-cell.is-wedding::before {
+  width: 34px; height: 34px;
+  background: var(--sky);
+  transform: translate(-50%, -46%) rotate(-7deg);
+}
+
 /* ===== Location ===== */
 .location__name { font-family: var(--hand); font-size: 1.28rem; font-weight: 700; color: var(--ink); }
 .location__addr { color: var(--ink-soft); font-size: 0.92rem; margin-top: 4px; }

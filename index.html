@@ -32,7 +32,7 @@
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap" />
   </noscript>
-  <link rel="stylesheet" href="assets/css/style.css?v=37" />
+  <link rel="stylesheet" href="assets/css/style.css?v=38" />
 </head>
 <body>
 
@@ -403,6 +403,17 @@
       <button class="gb-more" id="gbMore" type="button" hidden>더보기</button>
     </section>
 
+    <!-- ===== Save the Date — 하트 안에 담은 10월 달력 =====
+         날짜 칸은 main.js 의 initCalendar() 가 WEDDING 상수(2026-10-25)로 그린다.
+         예식일 칸에는 .is-wedding 이 붙고, 그 뒤에 하늘색 하트가 깔린다. -->
+    <section class="datecal reveal paper">
+      <p class="script-label">Save the Date</p>
+      <p class="datecal__when">2026년 10월 25일 일요일 오후 3시</p>
+      <div class="datecal__heart">
+        <div class="calendar__grid" id="calendar"></div>
+      </div>
+    </section>
+
     <!-- ===== 푸터 (검정 구겨진 종이) ===== -->
     <footer class="footer">
       <p class="footer__script">Thank you</p>
@@ -430,7 +441,7 @@
   <script defer src="assets/js/parking.js?v=19"></script>
   -->
   <script defer src="assets/js/decor.js?v=13"></script>
-  <script defer src="assets/js/main.js?v=12"></script>
+  <script defer src="assets/js/main.js?v=13"></script>
   <script defer src="assets/js/guestbook-config.js?v=1"></script>
   <script defer src="assets/js/guestbook.js?v=4"></script>
 </body>

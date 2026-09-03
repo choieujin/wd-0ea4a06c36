@@ -38,7 +38,7 @@
     var grid = document.getElementById("calendar");
     if (!grid) return;
     var y = WEDDING.getFullYear(), m = WEDDING.getMonth(), day = WEDDING.getDate();
-    var heads = ["일", "월", "화", "수", "목", "금", "토"];
+    var heads = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
     var html = "";
     heads.forEach(function (h, i) {
       html += '<div class="cal-head' + (i === 0 ? " sun" : "") + '">' + h + "</div>";
