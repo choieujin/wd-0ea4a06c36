@@ -707,30 +707,58 @@ section.paper + section.paper::after {
   border-radius: 8px; border: 1px solid var(--line); background: #fff;
 }
 
-/* ===== Accounts ===== */
-.accounts__desc { color: var(--ink-soft); font-size: 0.92rem; margin-bottom: 22px; }
-.acc-group { border: 1.5px solid var(--line); border-radius: 12px; margin-bottom: 12px; background: #fff; overflow: hidden; text-align: left; }
-.acc-group summary {
-  list-style: none; cursor: pointer; padding: 15px 18px;
-  font-family: var(--hand); font-size: 1.2rem; color: var(--ink);
-  display: flex; justify-content: space-between; align-items: center;
+/* ===== Accounts (검정 배경 · 손으로 자른 듯한 각진 카드) =====
+   li.acc-item 안쪽 구조는 admin 이 다시 쓰므로 모양은 전부 CSS 로 만든다. */
+.accounts__desc { color: rgba(247, 244, 236, 0.78); font-size: 0.92rem; margin-bottom: 26px; }
+
+.acc-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.acc-group { text-align: left; }
+.acc-group__label {
+  font-family: var(--hand); font-weight: 700; font-size: 0.95rem; color: #fff;
+  transform: rotate(-11deg); transform-origin: left bottom;
+  margin: 0 0 6px 8px;
 }
-.acc-group summary::-webkit-details-marker { display: none; }
-.acc-group summary::after { content: "▾"; color: var(--pink); transition: transform 0.2s; }
-.acc-group[open] summary::after { transform: rotate(180deg); }
-.acc-list { list-style: none; padding: 0 14px 12px; }
+.acc-list { list-style: none; padding: 0; display: grid; gap: 14px; }
+
+/* 카드: 각진 종잇조각. 한 장씩 조금씩 다른 모양으로 손맛을 낸다 */
 .acc-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 6px; border-top: 1px solid var(--line); gap: 10px;
+  display: block; text-align: center;
+  padding: 34px 10px 20px;
+  background: #f2e7cf;
+  /* 지붕이 있는 오각형 — 옆면은 거의 수직이라 글자가 잘리지 않는다 */
+  clip-path: polygon(50% 0%, 100% 20%, 97% 99%, 3% 97%, 0% 19%);
 }
-.acc-item__info { display: flex; flex-direction: column; }
-.acc-bank { font-size: 0.82rem; color: var(--ink-soft); }
-.acc-no { font-size: 1rem; color: var(--ink); letter-spacing: 0.02em; font-weight: 500; }
+.acc-group--bride .acc-item { background: #f6cdd9; }
+.acc-item:nth-child(2) {
+  padding: 22px 10px 24px;
+  clip-path: polygon(6% 6%, 96% 0%, 100% 92%, 3% 100%);
+}
+.acc-item:nth-child(3) {
+  padding: 24px 10px 22px;
+  clip-path: polygon(2% 10%, 50% 0%, 100% 8%, 97% 100%, 5% 94%);
+}
+.acc-item:nth-child(4) { clip-path: polygon(3% 0%, 100% 6%, 95% 100%, 0% 92%); }
+
+.acc-item__info { display: block; }
+.acc-bank { display: block; font-size: 0.78rem; color: var(--ink); line-height: 1.45; }
+.acc-no {
+  display: block; margin-top: 2px;
+  /* 계좌번호가 긴 은행도 있어 좁은 화면에서는 조금 줄인다 */
+  font-size: clamp(0.72rem, 3.3vw, 0.84rem); color: var(--ink); font-weight: 700;
+  letter-spacing: 0.01em; word-break: break-all;
+}
+/* 시안처럼 밑줄 링크 모양. 버튼 글자("복사")는 admin 이 다시 쓰므로
+   글자를 숨기고 ::after 로 "복사하기" 를 그린다. */
 .acc-copy {
-  flex-shrink: 0; padding: 8px 16px; border: none; border-radius: 20px;
-  background: var(--pink); color: #fff; font-size: 0.82rem; font-weight: 500; cursor: pointer;
+  margin-top: 8px; padding: 0; border: none; background: none;
+  font-size: 0; line-height: 1; cursor: pointer;
 }
-.acc-copy:active { background: var(--ink); }
+.acc-copy::after {
+  content: "복사하기";
+  font-family: var(--sans); font-size: 0.78rem; color: var(--ink);
+  border-bottom: 1px solid var(--ink); padding-bottom: 1px;
+}
+.acc-copy:active::after { color: var(--pink); border-bottom-color: var(--pink); }
 
 /* ===== Notice ===== */
 .notice__text { font-family: var(--pen); color: var(--ink); font-size: 1.1rem; line-height: 1.6; }
