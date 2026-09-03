@@ -230,6 +230,20 @@
       });
     });
 
+    var addrBtn = document.getElementById("addrCopy");
+    if (addrBtn) {
+      addrBtn.addEventListener("click", function () {
+        var el = document.querySelector(".location__addr");
+        var addr = el ? el.textContent.trim() : "";
+        if (!addr) return;
+        copyText(addr).then(function () {
+          toast("주소가 복사되었습니다.");
+        }).catch(function () {
+          toast("복사에 실패했습니다.");
+        });
+      });
+    }
+
     var share = document.getElementById("shareLink");
     if (share) {
       share.addEventListener("click", function () {

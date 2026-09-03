@@ -10,6 +10,7 @@
   --orage:#ffaa33;
   --navy: #403F6F;
   --pink-soft: #f0a4bb;
+  --blush: #e8b3c4;   /* 예식 일시 섹션 연핑크 배경 */
   --sky: #bcdcff;
   --sky-ink: #2f5f9c;
   --black: #141210;
@@ -505,49 +506,84 @@ section.paper + section.paper::after {
 .col-heart--2 { width: 19px; height: 19px; top: 32%; right: 4%; transform: rotate(12deg); }
 .col-heart--3 { width: 34px; height: 34px; bottom: 0; left: 40%; transform: rotate(-8deg); }
 
-/* ===== Calendar ===== */
-.calendar__headline { font-family: var(--hand); font-size: 1.2rem; line-height: 1.5; margin-bottom: 22px; color: var(--ink); }
+/* ===== Calendar (연핑크 배경 · 진한 핑크 하트 안에 달력) ===== */
+.calendar.paper { background: var(--blush); }
+/* 연핑크 배경에서는 핑크 글씨가 묻혀서 진한 로즈로 */
+.calendar .script-label, .calendar__dday { color: #a83258; }
+.calendar__headline { font-family: var(--hand); font-size: 1.2rem; line-height: 1.5; margin-bottom: 10px; color: var(--ink); }
 
-/* 달력을 큰 하트 위에 얹는다 */
-.calendar__card { position: relative; max-width: 320px; margin: 0 auto; padding: 40px 0 34px; }
+/* 하트가 달력을 감싼다. 달력은 하트의 가장 넓은 몸통에 오도록 위쪽으로 당겨 배치. */
+.calendar__card {
+  position: relative;
+  /* 좁은 화면에서는 섹션 좌우 패딩까지 써서 하트를 최대한 크게 */
+  width: 400px; max-width: calc(100% + 52px);
+  aspect-ratio: 400 / 368;
+  margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
+}
 .calendar__heart {
-  position: absolute; left: 50%; top: 50%;
-  width: 390px; height: 350px;
-  transform: translate(-50%, -46%);
-  background: var(--pink-soft);
-  opacity: 0.3;
-  clip-path: polygon(50% 100%, 10% 60%, 0% 36%, 9% 16%, 31% 11%, 50% 27%, 69% 11%, 91% 16%, 100% 36%, 90% 60%);
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  fill: var(--pink);
   pointer-events: none;
 }
+/* 폭은 하트에 비례(60%)해서 좁은 화면에서도 하트를 벗어나지 않는다 */
 .calendar__grid {
   position: relative;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px 0;
-  max-width: 320px;
-  margin: 0 auto;
-  font-size: 0.85rem;
+  gap: 2px 0;
+  width: 60%;
+  margin-top: -8%;
+  font-size: clamp(0.64rem, 2.5vw, 0.78rem);
 }
 .calendar__grid .cal-head {
   font-family: var(--script);
-  font-size: 0.82rem; letter-spacing: 0.06em;
-  color: var(--ink-soft); font-weight: 700; padding-bottom: 8px;
+  font-size: 0.96em; letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.82); font-weight: 700; padding-bottom: 6px;
 }
-.calendar__grid .cal-head.sun { color: var(--pink); }
-.calendar__grid .cal-cell { position: relative; padding: 8px 0; color: var(--ink); }
+.calendar__grid .cal-head.sun { color: #fff; }
+.calendar__grid .cal-cell { position: relative; padding: 5px 0; color: #fff; }
 .calendar__grid .cal-cell.empty { color: transparent; }
-.calendar__grid .cal-cell.sun { color: var(--pink); }
-.calendar__grid .cal-cell.is-wedding { color: #fff; font-weight: 800; }
+.calendar__grid .cal-cell.sun { color: #ffe0ea; }
+.calendar__grid .cal-cell.is-wedding { color: var(--sky-ink); font-weight: 800; }
 /* 하트를 먼저 그리고 그 위에 숫자를 얹는다(음수 z-index 는 섹션 배경에 가려짐) */
 .calendar__grid .cal-mark {
   position: absolute; left: 50%; top: 50%;
-  width: 34px; height: 34px;
-  background: var(--pink);
+  width: 28px; height: 28px;
+  background: var(--sky);
   clip-path: polygon(50% 100%, 10% 60%, 0% 36%, 9% 16%, 31% 11%, 50% 27%, 69% 11%, 91% 16%, 100% 36%, 90% 60%);
-  transform: translate(-50%, -46%);
+  transform: translate(-50%, -44%);
 }
 .calendar__grid .cal-num { position: relative; }
-.calendar__dday { margin: 20px 0 30px; font-family: var(--hand); color: var(--pink); font-size: 1.0rem; }
+.calendar__dday { margin: 6px 0 30px; font-family: var(--hand); color: var(--pink); font-size: 1.0rem; }
+
+/* ===== 검정 섹션 (예식 안내 · 오시는 길) ===== */
+.dark {
+  background: var(--black);
+  background-image: var(--grain);
+  background-blend-mode: soft-light;
+  color: #f7f4ec;
+}
+.dark .section-title { color: #fff; }
+.dark .notice__text { color: #f7f4ec; }
+.dark .notice__text + .notice__text { border-top-color: rgba(255, 255, 255, 0.28); }
+.dark .location__name { color: #fff; }
+.dark .location__addr { color: rgba(247, 244, 236, 0.75); }
+.dark .info-block { border-top-color: rgba(255, 255, 255, 0.22); }
+.dark .info-block p { color: #f7f4ec; }
+.dark .park-live__updated, .dark .park-live__foot { color: rgba(247, 244, 236, 0.72); }
+.dark .walk-map img { border-color: rgba(255, 255, 255, 0.25); }
+
+/* 주소 복사 버튼 */
+.addr-copy {
+  margin-top: 16px; padding: 10px 22px;
+  border: none; border-radius: 24px;
+  background: var(--pink); color: #fff;
+  font-family: var(--hand); font-size: 0.9rem; font-weight: 700;
+  cursor: pointer;
+}
+.addr-copy:active { background: #fff; color: var(--pink); }
 
 /* ===== Location ===== */
 .location__name { font-family: var(--hand); font-size: 1.28rem; font-weight: 700; color: var(--ink); }
@@ -700,7 +736,8 @@ section.paper + section.paper::after {
 .notice__text { font-family: var(--pen); color: var(--ink); font-size: 1.1rem; line-height: 1.6; }
 .notice__text + .notice__text { margin-top: 22px; padding-top: 22px; border-top: 1px dashed var(--line); }
 
-/* ===== Gallery (인스타그램 피드: 테두리 없이 꽉 찬 3열 격자) ===== */
+/* ===== Gallery (제목 없이 사진만 · 인스타그램 피드처럼 테두리 없이 꽉 찬 3열 격자) ===== */
+.gallery { padding-top: 34px; padding-bottom: 34px; }
 .gallery__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

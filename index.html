@@ -32,7 +32,7 @@
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap" />
   </noscript>
-  <link rel="stylesheet" href="assets/css/style.css?v=37" />
+  <link rel="stylesheet" href="assets/css/style.css?v=38" />
 </head>
 <body>
 
@@ -222,10 +222,8 @@
       </div>
     </section> -->
 
-    <!-- ===== 갤러리 ===== -->
+    <!-- ===== 갤러리 (제목 없이 사진만 꽉 차게) ===== -->
     <section class="gallery reveal paper">
-      <p class="script-label">Gallery</p>
-      <h2 class="section-title">갤러리</h2>
       <div class="gallery__grid" id="galleryGrid"></div>
       <p class="gallery__empty" id="galleryEmpty">사진을 준비 중입니다.</p>
     </section>
@@ -236,13 +234,19 @@
       <h2 class="section-title">예식 일시</h2>
       <p class="calendar__headline">2026년 10월 25일 일요일<br />오후 3시</p>
 
-      <!-- 달력은 main.js 의 initCalendar() 가 그린다(예식일에 하트 표시). -->
+      <!-- 달력은 main.js 의 initCalendar() 가 그린다(예식일에 하트 표시).
+           달력이 하트 안에 들어가야 하므로 하트 크기/여백을 바꿀 때는 화면으로 확인할 것. -->
       <div class="calendar__card">
-        <span class="calendar__heart" aria-hidden="true"></span>
+        <svg class="calendar__heart" viewBox="0 0 100 92" aria-hidden="true" focusable="false">
+          <path d="M50 90 C 16 66, 0 48, 0 29 C 0 11, 13 1, 27 1 C 38 1, 46 7, 50 15 C 54 7, 62 1, 73 1 C 87 1, 100 11, 100 29 C 100 48, 84 66, 50 90 Z" />
+        </svg>
         <div class="calendar__grid" id="calendar"></div>
       </div>
       <p class="calendar__dday" id="dday"></p>
+    </section>
 
+    <!-- ===== 예식 안내 (검정 배경) ===== -->
+    <section class="notice reveal dark">
       <p class="notice__text">용산가족공원 야외에서<br />진행되는 예식입니다.<br /><br />복장은 자유예요!<span role="img" aria-label="편한 옷차림(짱구 룩)" style="display:inline-block;vertical-align:-0.36em;margin:0 .12em;"><svg width="22" height="25" viewBox="0 0 28 32" xmlns="http://www.w3.org/2000/svg"><path d="M9 4 Q14 7 19 4 L25 8 L21 12 L20 11 L20 17.5 L8 17.5 L8 11 L7 12 L3 8 Z" fill="#E8412E"/><path d="M9 4 Q14 7 19 4 L17.4 5.6 Q14 8 10.6 5.6 Z" fill="#C12B20"/><path d="M8.4 18 L19.6 18 L19.6 28 L15.1 28 L14 22.4 L12.9 28 L8.4 28 Z" fill="#F2C12E"/></svg></span><br />격식 차리지 않으셔도 괜찮아요.<br /><br />흰옷이든 후드티에 청바지든,<br />편한 대로 소풍 오듯<br />와 주셔도 좋습니다 :)</p>
       <p class="notice__text">화환은 공간 특성상 정중히 사양합니다.<br />마음만 감사히 받겠습니다.</p>
     </section>
@@ -255,12 +259,14 @@
       </filter>
     </svg>
 
-    <!-- ===== 오시는 길 ===== -->
-    <section class="location reveal paper">
+    <!-- ===== 오시는 길 (검정 배경 · 흰 글씨) ===== -->
+    <section class="location reveal dark">
       <p class="script-label">Location</p>
       <h2 class="section-title">오시는 길</h2>
       <p class="location__name"><!--E:loc-name-->용산가족공원<!--/E:loc-name--></p>
       <p class="location__addr"><!--E:loc-addr-->서울특별시 용산구 서빙고로 137<!--/E:loc-addr--></p>
+      <!-- 주소는 .location__addr 에서 읽는다(admin 으로 주소를 고쳐도 그대로 복사됨) -->
+      <button class="addr-copy" id="addrCopy" type="button">주소 복사하기</button>
 
       <!-- 지도(도보 약도)를 안내 문구보다 먼저 보여준다. -->
       <div class="info-block" id="walkMapBlock">
@@ -447,7 +453,7 @@
   <script defer src="assets/js/parking.js?v=19"></script>
   -->
   <script defer src="assets/js/decor.js?v=12"></script>
-  <script defer src="assets/js/main.js?v=13"></script>
+  <script defer src="assets/js/main.js?v=14"></script>
   <script defer src="assets/js/guestbook-config.js?v=1"></script>
   <script defer src="assets/js/guestbook.js?v=4"></script>
 </body>
