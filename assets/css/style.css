@@ -1,11 +1,11 @@
 :root {
-  /* 핀터레스트 감성 팔레트: 크림 종이 + 핫핑크 + 하늘색 + 잉크 */
-  --cream: #efe6d2;
-  --cream-2: #e7dcc4;
-  --paper: #f6efdf;
-  --ink: #2a2723;
-  --ink-soft: #6b6457;
-  --line: #d8cdb4;
+  /* 오래된 편지지 팔레트: 세월 먹은 미색 종이 + 세피아 잉크 (표지·푸터는 먹색 유지) */
+  --cream: #e9ddc0;
+  --cream-2: #e1d3b1;
+  --paper: #efe5cb;
+  --ink: #35291b;
+  --ink-soft: #6f6350;
+  --line: #ccbb98;
   --pink: #e15a86;
   --orage:#ffaa33;
   --navy: #403F6F;
@@ -13,6 +13,19 @@
   --sky: #bcdcff;
   --sky-ink: #2f5f9c;
   --black: #141210;
+
+  /* 종이 위에 얹히는 카드/사진 테두리 — 순백 대신 미색(누렇게 바랜 톤) */
+  --card: #f7efda;
+  --card-2: #fbf5e6;
+  --photo-edge: #f8f1dd;
+
+  /* 편지지 위 강조색 — 바랜 장미빛 잉크 (.paper 안에서 --pink 를 대신한다) */
+  --rose: #b0546b;
+  --rose-soft: #d8a5b1;
+
+  /* 좌우 여백(매트) */
+  --frame: #0b0a08;
+  --gutter: 12px;
 
   --maxw: 460px;
   --hand: "Gowun Dodum", sans-serif;
@@ -22,13 +35,17 @@
 
   /* 종이 그레인 (재사용) */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* 종이 섬유결 — 아주 옅은 세로 결 */
+  --fiber: repeating-linear-gradient(93deg, rgba(122,96,52,0.032) 0 1px, rgba(122,96,52,0) 1px 7px);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
+/* 청첩장 양옆(과 위아래)에 먹색 매트를 두고 그 안에 편지지를 얹는다 */
 body {
-  background: #d8cdb4;
+  background: var(--frame);
+  padding: var(--gutter);
   color: var(--ink);
   font-family: var(--sans);
   line-height: 1.7;
@@ -40,28 +57,51 @@ body {
   max-width: var(--maxw);
   margin: 0 auto;
   background: var(--cream);
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.18);
+  /* 매트 안쪽에 미색 실선 한 줄 + 바깥 그림자 */
+  box-shadow: 0 0 0 1px rgba(240, 229, 202, 0.22), 0 14px 44px rgba(0, 0, 0, 0.55);
   overflow: hidden;
   position: relative;
 }
 
 section { padding: 70px 26px; text-align: center; position: relative; }
 
-/* 크림 종이 질감 */
-.paper { background: var(--cream); position: relative; }
+/* ===== 오래된 편지지 (표지 아래 전 구간) =====
+   바랜 미색 바탕 + 군데군데 물든 얼룩(폭싱) + 섬유결, 그 위에 그레인 한 겹.
+   가장자리는 손 타서 어두워진 느낌으로 inset 그림자를 준다. */
+.paper {
+  position: relative;
+  background-color: var(--paper);
+  background-image:
+    var(--fiber),
+    radial-gradient(58% 34% at 12% 8%, rgba(146, 112, 58, 0.10), transparent 70%),
+    radial-gradient(46% 30% at 88% 24%, rgba(133, 101, 52, 0.09), transparent 72%),
+    radial-gradient(34% 22% at 28% 58%, rgba(150, 116, 62, 0.07), transparent 74%),
+    radial-gradient(60% 38% at 78% 92%, rgba(120, 92, 48, 0.10), transparent 70%);
+  box-shadow:
+    inset 0 0 44px rgba(108, 84, 44, 0.14),
+    inset 0 0 120px rgba(108, 84, 44, 0.07);
+  /* 편지지 위 강조색은 바랜 장미빛으로 (표지·푸터의 핑크는 그대로 둔다) */
+  --pink: var(--rose);
+  --pink-soft: var(--rose-soft);
+  --sky: #a9c2d8;
+  --orage: #d69a45;
+}
 .paper::before {
   content: "";
   position: absolute; inset: 0;
   background-image: var(--grain);
-  opacity: 0.05;
+  opacity: 0.08;
   mix-blend-mode: multiply;
   pointer-events: none;
 }
+/* 섹션 경계는 종이를 접었다 편 자국처럼 */
 section.paper + section.paper::after {
   content: "";
-  position: absolute; top: 0; left: 12%; right: 12%;
-  height: 1px;
-  background: repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 12px);
+  position: absolute; top: 0; left: 8%; right: 8%;
+  height: 2px;
+  background:
+    linear-gradient(90deg, transparent, rgba(120, 94, 50, 0.28) 18%, rgba(120, 94, 50, 0.28) 82%, transparent),
+    linear-gradient(180deg, rgba(255, 250, 236, 0.5), transparent);
 }
 
 /* ===== 공통 타이틀 ===== */
@@ -165,31 +205,6 @@ section.paper + section.paper::after {
   display: flex; align-items: center; justify-content: center;
 }
 .heart-card__inner { padding: 0 13% 12%; color: #fff; transform: translateY(8%); }
-
-/* ===== 떠다니는 하트 장식 ===== */
-.float-heart {
-  position: absolute; width: 22px; height: 22px; z-index: 5;
-  background: var(--pink);
-  clip-path: polygon(50% 100%, 10% 60%, 0% 36%, 9% 16%, 31% 11%, 50% 27%, 69% 11%, 91% 16%, 100% 36%, 90% 60%);
-}
-.float-heart--a { top: 18%; right: 18px; transform: rotate(-12deg); width: 18px; height: 18px; opacity: 0.9; }
-.float-heart--b { bottom: 14%; left: 22px; transform: rotate(14deg); width: 26px; height: 26px; }
-.float-heart--c { top: 30px; right: 30px; transform: rotate(10deg); }
-
-/* ===== 각진 하트 유틸 (다양한 형태/크기) ===== */
-.xheart { display: inline-block; background: var(--pink); width: 20px; height: 20px; }
-.xheart--sky { background: var(--sky); }
-.xheart--v1 { clip-path: polygon(50% 100%, 10% 60%, 0% 36%, 9% 16%, 31% 11%, 50% 27%, 69% 11%, 91% 16%, 100% 36%, 90% 60%); }
-.xheart--v2 { clip-path: polygon(50% 100%, 16% 58%, 2% 32%, 13% 12%, 34% 12%, 50% 30%, 66% 12%, 87% 12%, 98% 32%, 84% 58%); }
-.xheart--v3 { clip-path: polygon(50% 96%, 6% 56%, 0% 33%, 14% 16%, 33% 16%, 50% 33%, 67% 16%, 86% 16%, 100% 33%, 94% 56%); }
-.xheart--v4 { clip-path: polygon(50% 100%, 4% 50%, 18% 12%, 39% 19%, 50% 36%, 61% 19%, 82% 12%, 96% 50%); }
-
-/* 페이지 곳곳에 흩뿌리는 장식 하트 (decor.js가 생성) */
-.deco-heart {
-  position: absolute; pointer-events: none; z-index: 3;
-  opacity: 0; transition: opacity 0.7s ease;
-}
-.deco-heart.is-on { opacity: var(--o, 0.85); }
 
 /* ===== Cover (검정 구겨진 종이) ===== */
 .cover {
@@ -391,7 +406,7 @@ section.paper + section.paper::after {
   font-family: var(--hand); font-size: 0.82rem; color: var(--ink-soft);
   opacity: 0.55;
 }
-.mframe.is-empty { background: #f4f1ea; }
+.mframe.is-empty { background: #eee5ce; }
 .mframe.is-empty .mframe__ph { z-index: 1; }
 
 /* 갤러리 월: 크기가 다른 액자가 격자에 정렬 */
@@ -403,7 +418,7 @@ section.paper + section.paper::after {
 
 .polaroid {
   display: inline-block;
-  background: #fff;
+  background: var(--photo-edge);
   padding: 12px 12px 44px;
   box-shadow: 0 10px 22px rgba(0,0,0,0.18);
   transform: rotate(2.5deg);
@@ -433,7 +448,7 @@ section.paper + section.paper::after {
 /* 메인 가족사진 (인화 프레임) */
 .collage__main {
   position: relative; width: 72%; margin: 0 auto;
-  background: #fff; padding: 8px; box-shadow: 0 7px 18px rgba(0,0,0,0.2);
+  background: var(--photo-edge); padding: 8px; box-shadow: 0 7px 18px rgba(0,0,0,0.2);
   transform: rotate(-2deg); z-index: 1;
 }
 .collage__main .frame { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: #f2e9d6; }
@@ -499,12 +514,6 @@ section.paper + section.paper::after {
   clip-path: polygon(50% 100%, 10% 60%, 0% 36%, 9% 16%, 31% 11%, 50% 27%, 69% 11%, 91% 16%, 100% 36%, 90% 60%);
 }
 
-/* 콜라주 위에 얹히는 하트 */
-.col-heart { position: absolute; z-index: 4; pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2)); }
-.col-heart--1 { width: 26px; height: 26px; top: 4%; left: 2%; transform: rotate(-16deg); }
-.col-heart--2 { width: 19px; height: 19px; top: 32%; right: 4%; transform: rotate(12deg); }
-.col-heart--3 { width: 34px; height: 34px; bottom: 0; left: 40%; transform: rotate(-8deg); }
-
 /* ===== Calendar ===== */
 .calendar__headline { font-family: var(--hand); font-size: 1.2rem; line-height: 1.5; margin-bottom: 26px; color: var(--ink); }
 .calendar__grid {
@@ -550,7 +559,7 @@ section.paper + section.paper::after {
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 500;
-  background: #fff;
+  background: var(--card);
 }
 .map-btn:active { background: var(--pink); color: #fff; }
 
@@ -608,7 +617,7 @@ section.paper + section.paper::after {
 .park-live__updated.is-stale { color: var(--pink); }
 .park-live__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 9px; }
 .park-card {
-  border: 1.5px solid #b5aea1; border-radius: 5px; background: #fff;
+  border: 1.5px solid #b5aea1; border-radius: 5px; background: var(--card);
   padding: 12px 14px; box-shadow: 2px 2px 0 rgba(20,18,16,0.08);
 }
 .park-card__head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
@@ -616,7 +625,7 @@ section.paper + section.paper::after {
 .park-card__chip {
   flex: none; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.02em;
   color: var(--black); padding: 2px 9px; border-radius: 20px;
-  border: 1.5px solid #b5aea1; background: #fff;
+  border: 1.5px solid #b5aea1; background: var(--card);
   display: inline-flex; align-items: center; gap: 5px;
 }
 .park-card__chip::before {
@@ -656,12 +665,12 @@ section.paper + section.paper::after {
 .walk-map { display: block; margin-top: 14px; }
 .walk-map img {
   width: 100%; height: auto; display: block;
-  border-radius: 8px; border: 1px solid var(--line); background: #fff;
+  border-radius: 8px; border: 1px solid var(--line); background: var(--card);
 }
 
 /* ===== Accounts ===== */
 .accounts__desc { color: var(--ink-soft); font-size: 0.92rem; margin-bottom: 22px; }
-.acc-group { border: 1.5px solid var(--line); border-radius: 12px; margin-bottom: 12px; background: #fff; overflow: hidden; text-align: left; }
+.acc-group { border: 1.5px solid var(--line); border-radius: 12px; margin-bottom: 12px; background: var(--card); overflow: hidden; text-align: left; }
 .acc-group summary {
   list-style: none; cursor: pointer; padding: 15px 18px;
   font-family: var(--hand); font-size: 1.2rem; color: var(--ink);
@@ -693,7 +702,7 @@ section.paper + section.paper::after {
 .gallery__grid img {
   width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block;
   border-radius: 3px; cursor: pointer; background: #eadfc8;
-  border: 4px solid #fff;
+  border: 4px solid var(--photo-edge);
   box-shadow: 0 3px 8px rgba(0,0,0,0.12);
   transition: opacity 0.3s, transform 0.3s;
 }
@@ -708,14 +717,14 @@ section.paper + section.paper::after {
 
 .gb-notice {
   font-size: 0.85rem; color: var(--ink-soft);
-  background: rgba(255, 255, 255, 0.55); border: 1px dashed var(--line); border-radius: 10px;
+  background: rgba(251, 245, 230, 0.62); border: 1px dashed var(--line); border-radius: 10px;
   padding: 10px 12px; margin-bottom: 18px;
 }
 .gb-notice[hidden] { display: none; }
 
 /* --- 입력 폼 --- */
 .gb-form {
-  background: #fff; border: 1.5px solid var(--line); border-radius: 12px;
+  background: var(--card); border: 1.5px solid var(--line); border-radius: 12px;
   padding: 14px; text-align: left; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 .gb-form[hidden] { display: none; }
@@ -723,11 +732,11 @@ section.paper + section.paper::after {
 
 .gb-input, .gb-textarea {
   font-family: var(--sans); font-size: 0.95rem; color: var(--ink);
-  background: #fdfcf8; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--card-2); border: 1px solid var(--line); border-radius: 8px;
   padding: 10px 12px; width: 100%; line-height: 1.6;
   -webkit-appearance: none; appearance: none;
 }
-.gb-input:focus, .gb-textarea:focus { outline: none; border-color: var(--pink-soft); background: #fff; }
+.gb-input:focus, .gb-textarea:focus { outline: none; border-color: var(--pink-soft); background: #fffaee; }
 .gb-input::placeholder, .gb-textarea::placeholder { color: #b6ae9d; }
 .gb-input--pw { flex: none; width: 46%; letter-spacing: 0.16em; }
 /* 안내 문구는 자간을 주지 않는다 — 입력칸에서 잘려 보인다 */
@@ -739,7 +748,7 @@ section.paper + section.paper::after {
 .gb-emoji-btn {
   position: absolute; top: 6px; right: 6px;
   width: 34px; height: 34px; padding: 0; font-size: 1.15rem; line-height: 1;
-  background: #f4eee1; border: 1px solid var(--line); border-radius: 8px;
+  background: #eee4cb; border: 1px solid var(--line); border-radius: 8px;
   cursor: pointer; transition: background 0.15s, transform 0.15s;
 }
 .gb-emoji-btn:active { transform: scale(0.94); }
@@ -748,7 +757,7 @@ section.paper + section.paper::after {
 /* --- 이모지 팔레트 --- */
 .gb-emoji {
   display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px;
-  margin-top: 8px; padding: 8px; background: #faf6ec;
+  margin-top: 8px; padding: 8px; background: #f5edd8;
   border: 1px solid var(--line); border-radius: 10px;
 }
 .gb-emoji[hidden] { display: none; }
@@ -758,7 +767,7 @@ section.paper + section.paper::after {
   /* 흑백 폰트 폴백을 피하고 컬러 이모지로 그린다 */
   font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
 }
-.gb-emoji__item:active { background: #efe6d2; }
+.gb-emoji__item:active { background: #e6dabb; }
 
 .gb-form__foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
 .gb-charcount { font-size: 0.75rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
@@ -779,11 +788,11 @@ section.paper + section.paper::after {
 
 .gb-item {
   position: relative;
-  background: #fff; border: 1px solid var(--line); border-radius: 12px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
   padding: 13px 15px 14px; margin-bottom: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.045);
 }
-.gb-item:nth-child(odd) { background: #fffdf7; }
+.gb-item:nth-child(odd) { background: var(--card-2); }
 /* 방금 보냈지만 아직 시트에 반영되기 전인 내 글 */
 .gb-item.is-pending { border-style: dashed; border-color: var(--pink-soft); }
 .gb-item.is-pending .gb-item__date { color: var(--pink); }
@@ -809,7 +818,7 @@ section.paper + section.paper::after {
 }
 .gb-confirm__ok { background: var(--pink); color: #fff; }
 .gb-confirm__ok:disabled { opacity: 0.55; cursor: default; }
-.gb-confirm__cancel { background: #efe6d2; color: var(--ink); }
+.gb-confirm__cancel { background: #e6dabb; color: var(--ink); }
 
 .gb-empty { margin-top: 16px; color: var(--ink-soft); font-size: 0.88rem; }
 .gb-empty[hidden] { display: none; }
@@ -820,7 +829,7 @@ section.paper + section.paper::after {
   padding: 8px 20px; cursor: pointer;
 }
 .gb-more[hidden] { display: none; }
-.gb-more:active { background: #efe6d2; }
+.gb-more:active { background: #e6dabb; }
 
 /* ===== Footer (검정 구겨진 종이) ===== */
 .footer {
@@ -904,11 +913,6 @@ section.paper + section.paper::after {
   background: linear-gradient(90deg, #6f6f6f, #f2f2f2, #6f6f6f);
   border-radius: 3px; box-shadow: 0 2px 5px rgba(0,0,0,0.55);
 }
-.locket__heart {
-  bottom: -18px; right: 16%; width: 22px; height: 22px; z-index: 5;
-  transform: rotate(-10deg);
-}
-
 /* ===== Lightbox ===== */
 .lightbox {
   position: fixed; inset: 0; background: rgba(0, 0, 0, 0.92);
@@ -932,5 +936,6 @@ section.paper + section.paper::after {
 .toast.is-show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 @media (min-width: 600px) {
-  .invitation { margin: 24px auto; border-radius: 10px; }
+  :root { --gutter: 30px; }
+  .invitation { margin: 10px auto; border-radius: 6px; }
 }
