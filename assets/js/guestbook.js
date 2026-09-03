@@ -30,12 +30,12 @@
   var PAGE_SIZE = 5;
 
   /**
-   * 이름·비밀번호 칸이 없을 때 서버로 대신 보낼 값.
+   * 닉네임을 안 남겼을 때(또는 비밀번호 칸이 없을 때) 서버로 대신 보낼 값.
    *
    * 시트에 붙여둔 스크립트가 예전 버전이면 이름·비밀번호를 "필수"로 검사한다.
    * 빈 값을 보내면 "이름을 입력해 주세요" 로 거부되므로, 통과할 수 있는 값을 채워 보낸다.
-   * 이 이름은 화면에 표시하지 않는다(익명 취급). 비밀번호는 아무도 모르는 난수라
-   * 사실상 본인 삭제가 불가한 것과 같다 — 삭제는 시트에서 행을 지우면 된다.
+   * 이 이름은 화면에 그대로("하객") 옅게 표시한다 — 닉네임을 남긴 글과 카드 모양을 맞추기 위해서다.
+   * 비밀번호는 아무도 모르는 난수라 사실상 본인 삭제가 불가한 것과 같다 — 삭제는 시트에서 행을 지우면 된다.
    */
   var ANON_NAME = "하객";
   function randomPin() { return String(Math.floor(1000 + Math.random() * 9000)); }
@@ -195,7 +195,7 @@
       if (!name && !message) { continue; }
       items.push({
         id: "r" + i,
-        name: name,   // 비어 있으면 카드에 이름 줄을 그리지 않는다
+        name: name,   // 비어 있으면 카드에 "하객" 으로 표시된다
         message: message,
         createdAt: r[idx.createdAt]
       });
@@ -445,6 +445,12 @@
     el.count.textContent = state.items.length ? state.items.length + "개의 축하 메시지" : "";
   }
 
+  /** 화면에 쓸 이름. 닉네임을 안 남겼거나 예전 익명 글이면 "하객". */
+  function displayName(item) {
+    var n = String(item.name == null ? "" : item.name).trim();
+    return n || ANON_NAME;
+  }
+
   function card(item) {
     var li = document.createElement("li");
     li.className = "gb-item" + (item.pending ? " is-pending" : "");
@@ -452,13 +458,13 @@
     var head = document.createElement("div");
     head.className = "gb-item__head";
 
-    // 이름은 받지 않지만, 예전에 이름과 함께 올라온 글은 그대로 보여준다
-    if (item.name && item.name !== ANON_NAME) {
-      var name = document.createElement("span");
-      name.className = "gb-item__name";
-      name.textContent = item.name; // textContent — 태그가 그대로 글자로 보인다(XSS 방지)
-      head.appendChild(name);
-    }
+    // 닉네임은 선택이라 없는 글(예전 글 포함)이 섞인다.
+    // 이름 줄을 빼면 카드마다 높이가 달라 어색하므로, 없을 때는 "하객" 으로 옅게 채운다.
+    var who = displayName(item);
+    var name = document.createElement("span");
+    name.className = "gb-item__name" + (who === ANON_NAME ? " gb-item__name--anon" : "");
+    name.textContent = who; // textContent — 태그가 그대로 글자로 보인다(XSS 방지)
+    head.appendChild(name);
 
     var date = document.createElement("span");
     date.className = "gb-item__date";
@@ -477,7 +483,7 @@
       del.type = "button";
       del.className = "gb-item__del";
       del.textContent = "삭제";
-      del.setAttribute("aria-label", item.name + "님의 메시지 삭제");
+      del.setAttribute("aria-label", displayName(item) + "님의 메시지 삭제");
       del.addEventListener("click", function () { openDelete(li, item); });
       li.appendChild(del);
     }
@@ -598,11 +604,11 @@
     e.preventDefault();
     if (state.sending) { return; }
 
-    var name = el.name ? el.name.value.trim() : ANON_NAME;
+    // 닉네임은 선택 — 비워 두면 익명 이름으로 보낸다(옛 스크립트가 이름을 필수로 볼 수 있다)
+    var name = (el.name ? el.name.value.trim() : "") || ANON_NAME;
     var message = el.message.value.trim();
     var password = el.password ? el.password.value.trim() : randomPin();
 
-    if (el.name && !name) { toast("이름을 입력해 주세요."); el.name.focus(); return; }
     if (!message) { toast("축하 메시지를 입력해 주세요."); el.message.focus(); return; }
     if (el.password && !/^\d{4}$/.test(password)) {
       toast("비밀번호는 숫자 4자리로 입력해 주세요.");
@@ -619,6 +625,8 @@
         state.items.unshift(item);
         renderList(true);
         el.message.value = "";
+        // 휴대폰을 돌려가며 쓸 수 있어 닉네임도 비운다(다음 사람 글에 남지 않게)
+        if (el.name) { el.name.value = ""; }
         if (el.password) { el.password.value = ""; }
         el.emojiPad.hidden = true;
         el.emojiBtn.setAttribute("aria-expanded", "false");

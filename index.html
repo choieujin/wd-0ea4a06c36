@@ -408,6 +408,12 @@
       <p class="gb-notice" id="gbNotice" hidden></p>
 
       <form class="gb-form" id="gbForm" autocomplete="off" novalidate>
+        <!-- 닉네임은 선택. 비워 두면 "하객" 으로 올라간다(guestbook.js 의 ANON_NAME). -->
+        <div class="gb-form__row">
+          <input class="gb-input" id="gbName" type="text"
+                 placeholder="닉네임 (선택)" aria-label="닉네임 (선택)" />
+        </div>
+
         <div class="gb-form__msg">
           <textarea class="gb-textarea" id="gbMsg" rows="4"
                     placeholder="축하 메시지를 남겨주세요 🎉" aria-label="축하 메시지"></textarea>
