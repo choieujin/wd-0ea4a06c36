@@ -515,10 +515,15 @@ section.paper + section.paper::after {
 /* 하트가 달력을 감싼다. 달력은 하트의 가장 넓은 몸통에 오도록 위쪽으로 당겨 배치. */
 .calendar__card {
   position: relative;
-  /* 좁은 화면에서는 섹션 좌우 패딩까지 써서 하트를 최대한 크게 */
-  width: 400px; max-width: calc(100% + 52px);
+  /* 좁은 화면에서는 섹션 좌우 패딩(26px)까지 써서 하트를 최대한 크게.
+     주의: width 를 컨테이너보다 크게 주면 margin:auto 가 0 으로 무시돼(CSS 과제약 규칙)
+     하트가 오른쪽으로 밀린다. 그래서 폭은 auto 로 두고 좌우 음수 마진으로 늘린다.
+     마진이 항상 좌우 같은 값이라 어떤 화면 폭에서도 가운데에 온다.
+       넓은 화면: (100% - 400px) / 2  → 폭 400px
+       좁은 화면: -26px               → 섹션 패딩까지 꽉 채움 */
+  width: auto;
+  margin: 0 max(-26px, calc((100% - 400px) / 2));
   aspect-ratio: 400 / 368;
-  margin: 0 auto;
   display: flex; align-items: center; justify-content: center;
 }
 .calendar__heart {
