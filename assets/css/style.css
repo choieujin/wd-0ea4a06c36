@@ -885,6 +885,8 @@ section.paper + section.paper::after {
 .gb-item.is-pending .gb-item__date { color: var(--pink); }
 .gb-item__head { display: flex; align-items: baseline; gap: 8px; padding-right: 38px; }
 .gb-item__name { font-family: var(--hand); font-size: 0.98rem; color: var(--ink); font-weight: 700; }
+/* 닉네임 없이 남긴 글("하객") — 이름 줄은 그대로 두되 옅게 */
+.gb-item__name--anon { color: var(--ink-soft); font-weight: 500; }
 .gb-item__date { font-size: 0.72rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
 .gb-item__body {
   margin-top: 6px; font-size: 0.93rem; line-height: 1.75; color: var(--ink);
@@ -957,6 +959,7 @@ section.paper + section.paper::after {
   box-shadow: none;
 }
 .dark .gb-item__name { color: #fff; }
+.dark .gb-item__name--anon { color: rgba(247, 244, 236, 0.6); }
 .dark .gb-item__body { color: #f7f4ec; }
 .dark .gb-item__date, .dark .gb-item__del { color: rgba(247, 244, 236, 0.62); }
 .dark .gb-item.is-pending { border-color: var(--pink-soft); }
