@@ -38,7 +38,7 @@
     var grid = document.getElementById("calendar");
     if (!grid) return;
     var y = WEDDING.getFullYear(), m = WEDDING.getMonth(), day = WEDDING.getDate();
-    var heads = ["일", "월", "화", "수", "목", "금", "토"];
+    var heads = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
     var html = "";
     heads.forEach(function (h, i) {
       html += '<div class="cal-head' + (i === 0 ? " sun" : "") + '">' + h + "</div>";
@@ -49,7 +49,10 @@
     for (var d = 1; d <= last; d++) {
       var dow = new Date(y, m, d).getDay();
       var cls = "cal-cell" + (dow === 0 ? " sun" : "") + (d === day ? " is-wedding" : "");
-      html += '<div class="' + cls + '">' + d + "</div>";
+      // 예식일은 하트 위에 숫자를 얹는다. 하트를 음수 z-index 로 깔면
+      // 섹션 배경(.paper)에 가려지므로 별도 요소로 먼저 그린다.
+      var inner = d === day ? '<span class="cal-mark"></span><span class="cal-num">' + d + "</span>" : d;
+      html += '<div class="' + cls + '">' + inner + "</div>";
     }
     grid.innerHTML = html;
 
@@ -226,6 +229,20 @@
         });
       });
     });
+
+    var addrBtn = document.getElementById("addrCopy");
+    if (addrBtn) {
+      addrBtn.addEventListener("click", function () {
+        var el = document.querySelector(".location__addr");
+        var addr = el ? el.textContent.trim() : "";
+        if (!addr) return;
+        copyText(addr).then(function () {
+          toast("주소가 복사되었습니다.");
+        }).catch(function () {
+          toast("복사에 실패했습니다.");
+        });
+      });
+    }
 
     var share = document.getElementById("shareLink");
     if (share) {

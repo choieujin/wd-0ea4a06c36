@@ -10,6 +10,7 @@
   --orage:#ffaa33;
   --navy: #403F6F;
   --pink-soft: #f0a4bb;
+  --blush: #e8b3c4;   /* 예식 일시 섹션 연핑크 배경 */
   --sky: #bcdcff;
   --sky-ink: #2f5f9c;
   --black: #141210;
@@ -505,37 +506,84 @@ section.paper + section.paper::after {
 .col-heart--2 { width: 19px; height: 19px; top: 32%; right: 4%; transform: rotate(12deg); }
 .col-heart--3 { width: 34px; height: 34px; bottom: 0; left: 40%; transform: rotate(-8deg); }
 
-/* ===== Calendar ===== */
-.calendar__headline { font-family: var(--hand); font-size: 1.2rem; line-height: 1.5; margin-bottom: 26px; color: var(--ink); }
+/* ===== Calendar (연핑크 배경 · 진한 핑크 하트 안에 달력) ===== */
+.calendar.paper { background: var(--blush); }
+/* 연핑크 배경에서는 핑크 글씨가 묻혀서 진한 로즈로 */
+.calendar .script-label, .calendar__dday { color: #a83258; }
+.calendar__headline { font-family: var(--hand); font-size: 1.2rem; line-height: 1.5; margin-bottom: 10px; color: var(--ink); }
+
+/* 하트가 달력을 감싼다. 달력은 하트의 가장 넓은 몸통에 오도록 위쪽으로 당겨 배치. */
+.calendar__card {
+  position: relative;
+  /* 좁은 화면에서는 섹션 좌우 패딩까지 써서 하트를 최대한 크게 */
+  width: 400px; max-width: calc(100% + 52px);
+  aspect-ratio: 400 / 368;
+  margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
+}
+.calendar__heart {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  fill: var(--pink);
+  pointer-events: none;
+}
+/* 폭은 하트에 비례(60%)해서 좁은 화면에서도 하트를 벗어나지 않는다 */
 .calendar__grid {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px 0;
-  max-width: 320px;
-  margin: 0 auto;
-  font-size: 0.85rem;
+  gap: 2px 0;
+  width: 60%;
+  margin-top: -8%;
+  font-size: clamp(0.64rem, 2.5vw, 0.78rem);
 }
-.calendar__grid .cal-head { color: var(--ink-soft); font-weight: 700; padding-bottom: 8px; font-size: 0.8rem; }
-.calendar__grid .cal-head.sun { color: var(--pink); }
-.calendar__grid .cal-cell { padding: 8px 0; color: var(--ink); }
+.calendar__grid .cal-head {
+  font-family: var(--script);
+  font-size: 0.96em; letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.82); font-weight: 700; padding-bottom: 6px;
+}
+.calendar__grid .cal-head.sun { color: #fff; }
+.calendar__grid .cal-cell { position: relative; padding: 5px 0; color: #fff; }
 .calendar__grid .cal-cell.empty { color: transparent; }
-.calendar__grid .cal-cell.sun { color: var(--pink); }
-.calendar__grid .cal-cell.is-wedding {
-  position: relative;
-  color: #fff;
-  font-weight: 800;
-}
-.calendar__grid .cal-cell.is-wedding::before {
-  content: "";
-  position: absolute;
-  inset: 50% auto auto 50%;
-  width: 32px; height: 32px;
-  background: var(--pink);
+.calendar__grid .cal-cell.sun { color: #ffe0ea; }
+.calendar__grid .cal-cell.is-wedding { color: var(--sky-ink); font-weight: 800; }
+/* 하트를 먼저 그리고 그 위에 숫자를 얹는다(음수 z-index 는 섹션 배경에 가려짐) */
+.calendar__grid .cal-mark {
+  position: absolute; left: 50%; top: 50%;
+  width: 28px; height: 28px;
+  background: var(--sky);
   clip-path: polygon(50% 100%, 10% 60%, 0% 36%, 9% 16%, 31% 11%, 50% 27%, 69% 11%, 91% 16%, 100% 36%, 90% 60%);
-  transform: translate(-50%, -46%);
-  z-index: -1;
+  transform: translate(-50%, -44%);
 }
-.calendar__dday { margin-top: 26px; font-family: var(--hand); color: var(--pink); font-size: 1.0rem; }
+.calendar__grid .cal-num { position: relative; }
+.calendar__dday { margin: 6px 0 30px; font-family: var(--hand); color: var(--pink); font-size: 1.0rem; }
+
+/* ===== 검정 섹션 (예식 안내 · 오시는 길) ===== */
+.dark {
+  background: var(--black);
+  background-image: var(--grain);
+  background-blend-mode: soft-light;
+  color: #f7f4ec;
+}
+.dark .section-title { color: #fff; }
+.dark .notice__text { color: #f7f4ec; }
+.dark .notice__text + .notice__text { border-top-color: rgba(255, 255, 255, 0.28); }
+.dark .location__name { color: #fff; }
+.dark .location__addr { color: rgba(247, 244, 236, 0.75); }
+.dark .info-block { border-top-color: rgba(255, 255, 255, 0.22); }
+.dark .info-block p { color: #f7f4ec; }
+.dark .park-live__updated, .dark .park-live__foot { color: rgba(247, 244, 236, 0.72); }
+.dark .walk-map img { border-color: rgba(255, 255, 255, 0.25); }
+
+/* 주소 복사 버튼 */
+.addr-copy {
+  margin-top: 16px; padding: 10px 22px;
+  border: none; border-radius: 24px;
+  background: var(--pink); color: #fff;
+  font-family: var(--hand); font-size: 0.9rem; font-weight: 700;
+  cursor: pointer;
+}
+.addr-copy:active { background: #fff; color: var(--pink); }
 
 /* ===== Location ===== */
 .location__name { font-family: var(--hand); font-size: 1.28rem; font-weight: 700; color: var(--ink); }
@@ -659,36 +707,65 @@ section.paper + section.paper::after {
   border-radius: 8px; border: 1px solid var(--line); background: #fff;
 }
 
-/* ===== Accounts ===== */
-.accounts__desc { color: var(--ink-soft); font-size: 0.92rem; margin-bottom: 22px; }
-.acc-group { border: 1.5px solid var(--line); border-radius: 12px; margin-bottom: 12px; background: #fff; overflow: hidden; text-align: left; }
-.acc-group summary {
-  list-style: none; cursor: pointer; padding: 15px 18px;
-  font-family: var(--hand); font-size: 1.2rem; color: var(--ink);
-  display: flex; justify-content: space-between; align-items: center;
+/* ===== Accounts (검정 배경 · 손으로 자른 듯한 각진 카드) =====
+   li.acc-item 안쪽 구조는 admin 이 다시 쓰므로 모양은 전부 CSS 로 만든다. */
+.accounts__desc { color: rgba(247, 244, 236, 0.78); font-size: 0.92rem; margin-bottom: 26px; }
+
+.acc-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.acc-group { text-align: left; }
+.acc-group__label {
+  font-family: var(--hand); font-weight: 700; font-size: 0.95rem; color: #fff;
+  transform: rotate(-11deg); transform-origin: left bottom;
+  margin: 0 0 6px 8px;
 }
-.acc-group summary::-webkit-details-marker { display: none; }
-.acc-group summary::after { content: "▾"; color: var(--pink); transition: transform 0.2s; }
-.acc-group[open] summary::after { transform: rotate(180deg); }
-.acc-list { list-style: none; padding: 0 14px 12px; }
+.acc-list { list-style: none; padding: 0; display: grid; gap: 14px; }
+
+/* 카드: 각진 종잇조각. 한 장씩 조금씩 다른 모양으로 손맛을 낸다 */
 .acc-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 6px; border-top: 1px solid var(--line); gap: 10px;
+  display: block; text-align: center;
+  padding: 34px 10px 20px;
+  background: #f2e7cf;
+  /* 지붕이 있는 오각형 — 옆면은 거의 수직이라 글자가 잘리지 않는다 */
+  clip-path: polygon(50% 0%, 100% 20%, 97% 99%, 3% 97%, 0% 19%);
 }
-.acc-item__info { display: flex; flex-direction: column; }
-.acc-bank { font-size: 0.82rem; color: var(--ink-soft); }
-.acc-no { font-size: 1rem; color: var(--ink); letter-spacing: 0.02em; font-weight: 500; }
+.acc-group--bride .acc-item { background: #f6cdd9; }
+.acc-item:nth-child(2) {
+  padding: 22px 10px 24px;
+  clip-path: polygon(6% 6%, 96% 0%, 100% 92%, 3% 100%);
+}
+.acc-item:nth-child(3) {
+  padding: 24px 10px 22px;
+  clip-path: polygon(2% 10%, 50% 0%, 100% 8%, 97% 100%, 5% 94%);
+}
+.acc-item:nth-child(4) { clip-path: polygon(3% 0%, 100% 6%, 95% 100%, 0% 92%); }
+
+.acc-item__info { display: block; }
+.acc-bank { display: block; font-size: 0.78rem; color: var(--ink); line-height: 1.45; }
+.acc-no {
+  display: block; margin-top: 2px;
+  /* 계좌번호가 긴 은행도 있어 좁은 화면에서는 조금 줄인다 */
+  font-size: clamp(0.72rem, 3.3vw, 0.84rem); color: var(--ink); font-weight: 700;
+  letter-spacing: 0.01em; word-break: break-all;
+}
+/* 시안처럼 밑줄 링크 모양. 버튼 글자("복사")는 admin 이 다시 쓰므로
+   글자를 숨기고 ::after 로 "복사하기" 를 그린다. */
 .acc-copy {
-  flex-shrink: 0; padding: 8px 16px; border: none; border-radius: 20px;
-  background: var(--pink); color: #fff; font-size: 0.82rem; font-weight: 500; cursor: pointer;
+  margin-top: 8px; padding: 0; border: none; background: none;
+  font-size: 0; line-height: 1; cursor: pointer;
 }
-.acc-copy:active { background: var(--ink); }
+.acc-copy::after {
+  content: "복사하기";
+  font-family: var(--sans); font-size: 0.78rem; color: var(--ink);
+  border-bottom: 1px solid var(--ink); padding-bottom: 1px;
+}
+.acc-copy:active::after { color: var(--pink); border-bottom-color: var(--pink); }
 
 /* ===== Notice ===== */
 .notice__text { font-family: var(--pen); color: var(--ink); font-size: 1.1rem; line-height: 1.6; }
 .notice__text + .notice__text { margin-top: 22px; padding-top: 22px; border-top: 1px dashed var(--line); }
 
-/* ===== Gallery (인스타그램 피드: 테두리 없이 꽉 찬 3열 격자) ===== */
+/* ===== Gallery (제목 없이 사진만 · 인스타그램 피드처럼 테두리 없이 꽉 찬 3열 격자) ===== */
+.gallery { padding-top: 34px; padding-bottom: 34px; }
 .gallery__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
