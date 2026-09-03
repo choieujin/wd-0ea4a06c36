@@ -93,6 +93,16 @@ section.paper + section.paper::after {
 .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.9s ease, transform 0.9s ease; }
 .reveal.is-visible { opacity: 1; transform: none; }
 
+/* 검정 섹션(하단)은 배경을 처음부터 깔아 둔다.
+   섹션 통째로 페이드인하면 스크롤할 때 크림색 위에 검정이 나중에 덮이는 것처럼 보인다.
+   → 배경은 고정하고 내용만 올라오게 한다. (.deco-heart 는 자체 페이드가 있어 제외) */
+.reveal.dark { opacity: 1; transform: none; }
+.reveal.dark > *:not(.deco-heart) {
+  opacity: 0; transform: translateY(26px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+.reveal.dark.is-visible > *:not(.deco-heart) { opacity: 1; transform: none; }
+
 /* 표지는 첫 화면이므로 JS(IntersectionObserver) 실행을 기다리지 않고
    CSS 로드 애니메이션으로 즉시 페이드인 → 초기 화면 지연 방지 */
 .cover.reveal { animation: coverIn 0.9s ease both; }
@@ -100,6 +110,7 @@ section.paper + section.paper::after {
 
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
+  .reveal.dark > *:not(.deco-heart) { opacity: 1; transform: none; transition: none; }
   .cover.reveal { animation: none; opacity: 1; transform: none; }
 }
 
