@@ -506,8 +506,21 @@ section.paper + section.paper::after {
 .col-heart--3 { width: 34px; height: 34px; bottom: 0; left: 40%; transform: rotate(-8deg); }
 
 /* ===== Calendar ===== */
-.calendar__headline { font-family: var(--hand); font-size: 1.2rem; line-height: 1.5; margin-bottom: 26px; color: var(--ink); }
+.calendar__headline { font-family: var(--hand); font-size: 1.2rem; line-height: 1.5; margin-bottom: 22px; color: var(--ink); }
+
+/* 달력을 큰 하트 위에 얹는다 */
+.calendar__card { position: relative; max-width: 320px; margin: 0 auto; padding: 40px 0 34px; }
+.calendar__heart {
+  position: absolute; left: 50%; top: 50%;
+  width: 390px; height: 350px;
+  transform: translate(-50%, -46%);
+  background: var(--pink-soft);
+  opacity: 0.3;
+  clip-path: polygon(50% 100%, 10% 60%, 0% 36%, 9% 16%, 31% 11%, 50% 27%, 69% 11%, 91% 16%, 100% 36%, 90% 60%);
+  pointer-events: none;
+}
 .calendar__grid {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 6px 0;
@@ -515,27 +528,26 @@ section.paper + section.paper::after {
   margin: 0 auto;
   font-size: 0.85rem;
 }
-.calendar__grid .cal-head { color: var(--ink-soft); font-weight: 700; padding-bottom: 8px; font-size: 0.8rem; }
+.calendar__grid .cal-head {
+  font-family: var(--script);
+  font-size: 0.82rem; letter-spacing: 0.06em;
+  color: var(--ink-soft); font-weight: 700; padding-bottom: 8px;
+}
 .calendar__grid .cal-head.sun { color: var(--pink); }
-.calendar__grid .cal-cell { padding: 8px 0; color: var(--ink); }
+.calendar__grid .cal-cell { position: relative; padding: 8px 0; color: var(--ink); }
 .calendar__grid .cal-cell.empty { color: transparent; }
 .calendar__grid .cal-cell.sun { color: var(--pink); }
-.calendar__grid .cal-cell.is-wedding {
-  position: relative;
-  color: #fff;
-  font-weight: 800;
-}
-.calendar__grid .cal-cell.is-wedding::before {
-  content: "";
-  position: absolute;
-  inset: 50% auto auto 50%;
-  width: 32px; height: 32px;
+.calendar__grid .cal-cell.is-wedding { color: #fff; font-weight: 800; }
+/* 하트를 먼저 그리고 그 위에 숫자를 얹는다(음수 z-index 는 섹션 배경에 가려짐) */
+.calendar__grid .cal-mark {
+  position: absolute; left: 50%; top: 50%;
+  width: 34px; height: 34px;
   background: var(--pink);
   clip-path: polygon(50% 100%, 10% 60%, 0% 36%, 9% 16%, 31% 11%, 50% 27%, 69% 11%, 91% 16%, 100% 36%, 90% 60%);
   transform: translate(-50%, -46%);
-  z-index: -1;
 }
-.calendar__dday { margin-top: 26px; font-family: var(--hand); color: var(--pink); font-size: 1.0rem; }
+.calendar__grid .cal-num { position: relative; }
+.calendar__dday { margin: 20px 0 30px; font-family: var(--hand); color: var(--pink); font-size: 1.0rem; }
 
 /* ===== Location ===== */
 .location__name { font-family: var(--hand); font-size: 1.28rem; font-weight: 700; color: var(--ink); }
